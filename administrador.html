@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Mi Mini Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #2563eb; --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --dark: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        /* Ajuste de pantalla completa para evitar errores de scroll */
+        body { background: #f8fafc; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        header { background: var(--dark); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        
+        .main-content { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden; }
+        
+        /* Formulario lateral */
+        .sidebar { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; }
+        .btn-save { background: var(--success); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-save:hover { background: #1ba952; }
+
+        /* Contenedor de Inventario */
+        .inventory-card { background: white; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* Barra de Búsqueda */
+        .search-container { padding: 15px 20px; background: #fff; border-bottom: 1px solid #f1f5f9; }
+        .search-wrapper { position: relative; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        #search-input { padding-left: 45px; background: #f8fafc; border: 1px solid #e2e8f0; }
+
+        /* Área de Tabla con Scroll Arreglado */
+        .table-area { flex: 1; overflow-y: auto; position: relative; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+        thead { position: sticky; top: 0; background: #f1f5f9; z-index: 10; }
+        th, td { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        
+        .p-img { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; background: #eee; }
+        .stock-input { width: 75px; padding: 6px; border-radius: 6px; border: 1px solid transparent; font-weight: 700; text-align: center; }
+        .stock-input:focus { border-color: var(--primary); background: #f0f7ff; outline: none; }
+        
+        /* Alertas de Stock */
+        .low-stock-label { color: var(--danger); font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-top: 4px; display: inline-block; }
+        .row-warning { border-left: 4px solid var(--danger); }
+
+        .btn-act { border: none; padding: 8px; border-radius: 6px; cursor: pointer; background: #f1f5f9; transition: 0.2s; }
+        .btn-act:hover { background: #e2e8f0; }
+        .is-hidden { opacity: 0.4; filter: grayscale(1); }
+    </style>
+</head>
+<body>
+
+<script>
+    const claveCorrecta = "2024"; 
+    const acceso = prompt("🔐 Clave de Administrador:");
+    if (acceso !== claveCorrecta) {
+        alert("Acceso denegado.");
+        window.location.href = "index.html";
+    }
+</script>
+
+<header>
+    <h2><i class="fas fa-boxes"></i> Panel de Inventario</h2>
+    <div style="text-align: right">
+        <span id="low-stock-alert" style="color: #ff9f9f; font-weight: bold; margin-right: 15px;"></span>
+        <small style="color: #4ade80;"><i class="fas fa-circle"></i> Sincronizado</small>
+    </div>
+</header>
+
+<div class="main-content">
+    <div class="sidebar">
+        <h3>Añadir Producto</h3>
+        <input type="text" id="p-name" placeholder="Nombre del producto">
+        <input type="number" id="p-price" step="0.01" placeholder="Precio de venta ($)">
+        <input type="number" id="p-stock" placeholder="Cantidad inicial">
+        <select id="p-cat">
+            <option value="Abarrotes">Abarrotes</option>
+            <option value="Bebidas">Bebidas</option>
+            <option value="Carnes">Carnes</option>
+            <option value="Limpieza">Limpieza</option>
+            <option value="Otros">Otros</option>
+        </select>
+        <input type="file" id="p-img" accept="image/*">
+        <button class="btn-save" id="btn-save"><i class="fas fa-cloud-upload-alt"></i> GUARDAR PRODUCTO</button>
+        <p style="font-size: 0.75rem; color: #64748b; margin-top: 10px;">* El sistema evitará nombres duplicados automáticamente.</p>
+    </div>
+
+    <div class="inventory-card">
+        <!-- BUSCADOR -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Buscar producto por nombre para aumentar stock...">
+            </div>
+        </div>
+
+        <!-- TABLA CON SCROLL -->
+        <div class="table-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Descripción</th>
+                        <th>Precio ($)</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+      authDomain: "mi-mini-market.firebaseapp.com",
+      projectId: "mi-mini-market",
+      storageBucket: "mi-mini-market.firebasestorage.app",
+      messagingSenderId: "19960510315",
+      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const prodsCol = collection(db, "productos");
+
+    let allProducts = []; // Copia local para búsqueda y duplicados
+
+    // ESCUCHAR DATOS
+    onSnapshot(prodsCol, (snap) => {
+        allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderInventory(allProducts);
+    });
+
+    // GUARDAR PRODUCTO (CON VALIDACIÓN DE DUPLICADOS)
+    document.getElementById('btn-save').onclick = async () => {
+        const name = document.getElementById('p-name').value.trim();
+        const price = document.getElementById('p-price').value;
+        const stock = document.getElementById('p-stock').value;
+        const file = document.getElementById('p-img').files[0];
+
+        if(!name || !price || !stock) return alert("Por favor, rellena los campos necesarios.");
+
+        // VALIDAR DUPLICADO
+        const duplicado = allProducts.find(p => p.name.toLowerCase() === name.toLowerCase());
+        if(duplicado) {
+            alert(`⚠️ ADVERTENCIA: El producto "${name}" ya existe en el inventario. Úsa el buscador para aumentar su stock.`);
+            return;
+        }
+
+        const img = file ? await compress(file) : "https://via.placeholder.com/100";
+        
+        await addDoc(prodsCol, {
+            name: name, price: price, stock: parseInt(stock),
+            img: img, visible: true, category: document.getElementById('p-cat').value
+        });
+
+        alert("Producto registrado correctamente.");
+        document.getElementById('p-name').value = '';
+        document.getElementById('p-price').value = '';
+        document.getElementById('p-stock').value = '';
+        document.getElementById('p-img').value = '';
+    };
+
+    // FUNCIÓN PARA RENDERIZAR
+    function renderInventory(products) {
+        const list = document.getElementById('inventory-list');
+        list.innerHTML = '';
+        let countLow = 0;
+
+        products.forEach(p => {
+            const tr = document.createElement('tr');
+            const isLow = p.stock < 5;
+            if(isLow) { tr.classList.add('row-warning'); countLow++; }
+            if(!p.visible) tr.classList.add('is-hidden');
+
+            tr.innerHTML = `
+                <td><img src="${p.img}" class="p-img"></td>
+                <td><b>${p.name}</b><br><small style="color:gray">${p.category}</small></td>
+                <td><input type="number" step="0.01" class="stock-input" value="${p.price}" onchange="updateValue('${p.id}', 'price', this.value)"></td>
+                <td>
+                    <input type="number" class="stock-input" style="color: ${isLow ? 'red' : 'black'}" value="${p.stock}" onchange="updateValue('${p.id}', 'stock', this.value)">
+                    ${isLow ? '<br><span class="low-stock-label">BAJO STOCK</span>' : ''}
+                </td>
+                <td>
+                    <button class="btn-act" onclick="updateValue('${p.id}', 'visible', ${!p.visible})"><i class="fas ${p.visible?'fa-eye':'fa-eye-slash'}"></i></button>
+                    <button class="btn-act" style="color:var(--danger)" onclick="deleteItem('${p.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            list.appendChild(tr);
+        });
+        document.getElementById('low-stock-alert').innerText = countLow > 0 ? `⚠️ ${countLow} productos por agotarse` : '';
+    }
+
+    // BUSCADOR EN TIEMPO REAL
+    document.getElementById('search-input').oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
+        renderInventory(filtered);
+    };
+
+    window.updateValue = (id, field, val) => {
+        const finalVal = field === 'stock' ? parseInt(val) : (field === 'visible' ? val : val);
+        updateDoc(doc(db, "productos", id), { [field]: finalVal });
+    };
+
+    window.deleteItem = (id) => confirm("¿Deseas eliminar este producto permanentemente?") && deleteDoc(doc(db, "productos", id));
+
+    async function compress(file) {
+        return new Promise(res => {
+            const r = new FileReader(); r.readAsDataURL(file);
+            r.onload = e => {
+                const i = new Image(); i.src = e.target.result;
+                i.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 300; canvas.height = 300;
+                    canvas.getContext('2d').drawImage(i, 0, 0, 300, 300);
+                    res(canvas.toDataURL('image/jpeg', 0.6));
+                };
+            };
+        });
+    }
+</script>
+</body>
+</html>

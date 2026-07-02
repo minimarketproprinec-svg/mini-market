@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SISTEMA DE PEDIDOS | Monitor & Historial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <!-- Librería para generar PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* MONITOR SUPERIOR */
+        .monitor-box { background: white; color: #1e293b; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 450px; width: 95%; margin-bottom: 30px; }
+        .status-badge { background: #dcfce7; color: #166534; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; }
+        .pulse { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse-anim 1.5s infinite; }
+        @keyframes pulse-anim { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* TABLA DE HISTORIAL */
+        .history-container { background: #1e293b; width: 95%; max-width: 900px; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #334155; }
+        h2 { margin: 0 0 20px 0; font-size: 1.2rem; color: #94a3b8; display: flex; align-items: center; gap: 10px; }
+        
+        .history-table { width: 100%; border-collapse: collapse; color: #cbd5e1; font-size: 0.85rem; }
+        .history-table th { text-align: left; padding: 12px; border-bottom: 2px solid #334155; color: #f8fafc; }
+        .history-table td { padding: 12px; border-bottom: 1px solid #334155; }
+        .history-table tr:hover { background: #33415544; }
+
+        .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-reprint { background: #334155; color: white; margin-right: 5px; }
+        .btn-reprint:hover { background: #475569; }
+        .btn-pdf { background: #ef4444; color: white; }
+        .btn-pdf:hover { background: #dc2626; }
+
+        /* FORMATO IMPRESIÓN (OCULTO) */
+        #factura-imprimir { display: none; }
+        @media print {
+            body, .monitor-box, .history-container, audio { display: none !important; }
+            #factura-imprimir { display: block !important; position: absolute; top: 0; left: 0; width: 100%; color: black !important; background: white !important; font-family: 'Courier Prime', monospace !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MONITOR DE ESTADO -->
+    <div class="monitor-box">
+        <div style="font-size: 3rem;">📠</div>
+        <h1 style="margin: 5px 0; font-weight: 800; font-size: 1.5rem;">AUTO-IMPRESIÓN</h1>
+        <div class="status-badge"><div class="pulse"></div> EN LÍNEA</div>
+        <p style="font-size: 0.75rem; margin-top: 10px; color: #64748b;">Los pedidos nuevos se imprimen solos. Haga clic aquí para audio.</p>
+    </div>
+
+    <!-- SECCIÓN DE HISTORIAL -->
+    <div class="history-container">
+        <h2><i class="fas fa-history"></i> Historial de Pedidos Recientes</h2>
+        <div style="overflow-x: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- Se llena con Firebase -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="factura-imprimir"></div>
+    <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+        authDomain: "mi-mini-market.firebaseapp.com",
+        projectId: "mi-mini-market",
+        storageBucket: "mi-mini-market.firebasestorage.app",
+        messagingSenderId: "19960510315",
+        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let yaCargoTodo = false;
+    let baseDeDatos = [];
+
+    // Escuchar los últimos 20 pedidos
+    const q = query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(20));
+
+    onSnapshot(q, (snapshot) => {
+        const hBody = document.getElementById('history-body');
+        hBody.innerHTML = "";
+        baseDeDatos = [];
+
+        snapshot.docs.forEach((docSnap) => {
+            const p = docSnap.data();
+            const id = docSnap.id;
+            baseDeDatos.push({ id, ...p });
+
+            // Rellenar tabla de historial
+            hBody.innerHTML += `
+                <tr>
+                    <td>${p.fechaTexto.split(',')[0]}<br><small>${p.fechaTexto.split(',')[1]}</small></td>
+                    <td><b>${p.cliente}</b><br><small>${p.direccion.ciudadela}</small></td>
+                    <td style="color:#4ade80; font-weight:bold">$${p.total.toFixed(2)}</td>
+                    <td>${p.pago.toUpperCase()}</td>
+                    <td>
+                        <button class="btn-action btn-reprint" onclick="window.reimprimir('${id}')"><i class="fas fa-print"></i></button>
+                        <button class="btn-action btn-pdf" onclick="window.generarPDF('${id}')"><i class="fas fa-file-pdf"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Lógica de Auto-Impresión (Solo para pedidos nuevos)
+        if (!yaCargoTodo) {
+            yaCargoTodo = true;
+            return;
+        }
+
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                const nuevoPedido = change.doc.data();
+                lanzarTicket(nuevoPedido);
+            }
+        });
+    });
+
+    // FUNCIÓN PRINCIPAL DE TICKET
+    function lanzarTicket(p) {
+        document.getElementById('beep').play().catch(() => {});
+        
+        let itemsHtml = "";
+        p.items.forEach(i => {
+            itemsHtml += `<div>${i.name.toUpperCase().substring(0,18).padEnd(18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`;
+        });
+
+        const diseño = `
+            <div style="width: 280px; padding: 10px; color: black; background: white; font-family: 'Courier Prime', monospace;">
+                <center>
+                    <strong style="font-size: 1.2rem;">MI MINI MARKET</strong><br>
+                    BABAHOYO, ECUADOR<br>
+                    ---------------------------<br>
+                    <strong>ORDEN DE ENTREGA</strong><br>
+                </center>
+                <br>
+                <b>FECHA:</b> ${p.fechaTexto}<br>
+                <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
+                <b>CDLA:</b> ${p.direccion.ciudadela.toUpperCase()}<br>
+                <b>MZ:</b> ${p.direccion.manzana} &nbsp; <b>VILLA:</b> ${p.direccion.villa}<br>
+                <b>PAGO:</b> ${p.pago.toUpperCase()}<br>
+                ${p.pagaCon ? '<b>PAGA CON:</b> $' + p.pagaCon : ''}<br>
+                ---------------------------<br>
+                <b>PRODUCTOS:</b><br>
+                ${itemsHtml}
+                ---------------------------<br>
+                <strong style="font-size: 1.1rem;">TOTAL A PAGAR: $${p.total.toFixed(2)}</strong><br>
+                <br>
+                <center>*** COPIA DE CONTROL ***</center>
+            </div>
+        `;
+
+        const area = document.getElementById('factura-imprimir');
+        area.innerHTML = diseño;
+
+        setTimeout(() => { window.print(); }, 1000);
+    }
+
+    // ACCIÓN: REIMPRIMIR
+    window.reimprimir = (id) => {
+        const pedido = baseDeDatos.find(p => p.id === id);
+        if(pedido) lanzarTicket(pedido);
+    };
+
+    // ACCIÓN: GENERAR PDF
+    window.generarPDF = (id) => {
+        const p = baseDeDatos.find(p => p.id === id);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: [80, 150] });
+
+        doc.setFont("courier", "bold");
+        doc.setFontSize(12);
+        doc.text("MI MINI MARKET", 40, 10, { align: "center" });
+        doc.setFontSize(10);
+        doc.text("ORDEN DE VENTA", 40, 15, { align: "center" });
+        doc.text("--------------------------", 40, 20, { align: "center" });
+
+        doc.setFont("courier", "normal");
+        doc.text(`FECHA: ${p.fechaTexto}`, 5, 28);
+        doc.text(`CLIENTE: ${p.cliente}`, 5, 33);
+        doc.text(`CDLA: ${p.direccion.ciudadela}`, 5, 38);
+        doc.text(`MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}`, 5, 43);
+        doc.text(`PAGO: ${p.pago}`, 5, 48);
+        doc.text("--------------------------", 40, 53, { align: "center" });
+
+        let y = 60;
+        p.items.forEach(i => {
+            doc.text(`${i.name.substring(0,15)} x${i.qty}`, 5, y);
+            doc.text(`$${(i.price*i.qty).toFixed(2)}`, 75, y, { align: "right" });
+            y += 5;
+        });
+
+        doc.text("--------------------------", 40, y + 2, { align: "center" });
+        doc.setFont("courier", "bold");
+        doc.text(`TOTAL: $${p.total.toFixed(2)}`, 75, y + 8, { align: "right" });
+
+        doc.save(`Pedido_${p.cliente}_${Date.now()}.pdf`);
+    };
+
+    document.addEventListener('click', () => { console.log("Audio On"); });
+
+</script>
+</body>
+</html>
