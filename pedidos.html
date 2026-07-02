@@ -4,55 +4,66 @@
     <meta charset="UTF-8">
     <title>SISTEMA DE PEDIDOS | Monitor & Historial</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
-    <!-- Librería para generar PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- DISEÑO PARA LA PANTALLA --- */
         body { font-family: 'Poppins', sans-serif; background: #0f172a; color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* MONITOR SUPERIOR */
         .monitor-box { background: white; color: #1e293b; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 450px; width: 95%; margin-bottom: 30px; }
         .status-badge { background: #dcfce7; color: #166534; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; }
         .pulse { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse-anim 1.5s infinite; }
         @keyframes pulse-anim { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-        /* TABLA DE HISTORIAL */
         .history-container { background: #1e293b; width: 95%; max-width: 900px; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #334155; }
         h2 { margin: 0 0 20px 0; font-size: 1.2rem; color: #94a3b8; display: flex; align-items: center; gap: 10px; }
         
         .history-table { width: 100%; border-collapse: collapse; color: #cbd5e1; font-size: 0.85rem; }
         .history-table th { text-align: left; padding: 12px; border-bottom: 2px solid #334155; color: #f8fafc; }
         .history-table td { padding: 12px; border-bottom: 1px solid #334155; }
-        .history-table tr:hover { background: #33415544; }
+        
+        .btn-action { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-reprint { background: #475569; margin-right: 5px; }
+        .btn-pdf { background: #ef4444; }
 
-        .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-reprint { background: #334155; color: white; margin-right: 5px; }
-        .btn-reprint:hover { background: #475569; }
-        .btn-pdf { background: #ef4444; color: white; }
-        .btn-pdf:hover { background: #dc2626; }
+        /* --- CONFIGURACIÓN CRÍTICA PARA IMPRESIÓN --- */
+        #factura-imprimir { 
+            display: none; 
+        }
 
-        /* FORMATO IMPRESIÓN (OCULTO) */
-        #factura-imprimir { display: none; }
         @media print {
-            body, .monitor-box, .history-container, audio { display: none !important; }
-            #factura-imprimir { display: block !important; position: absolute; top: 0; left: 0; width: 100%; color: black !important; background: white !important; font-family: 'Courier Prime', monospace !important; }
+            /* NO ocultamos el body, ocultamos solo los elementos visuales del monitor */
+            body { 
+                background: white !important; 
+            }
+            .monitor-box, .history-container, audio, i, button { 
+                display: none !important; 
+            }
+            /* Mostramos la factura en la parte superior */
+            #factura-imprimir { 
+                display: block !important; 
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                color: black !important;
+                background: white !important;
+                font-family: 'Courier Prime', monospace !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- MONITOR DE ESTADO -->
     <div class="monitor-box">
         <div style="font-size: 3rem;">📠</div>
-        <h1 style="margin: 5px 0; font-weight: 800; font-size: 1.5rem;">AUTO-IMPRESIÓN</h1>
-        <div class="status-badge"><div class="pulse"></div> EN LÍNEA</div>
-        <p style="font-size: 0.75rem; margin-top: 10px; color: #64748b;">Los pedidos nuevos se imprimen solos. Haga clic aquí para audio.</p>
+        <h1 style="margin: 5px 0; font-weight: 800;">CENTRO DE IMPRESIÓN</h1>
+        <div class="status-badge"><div class="pulse"></div> SISTEMA CONECTADO</div>
+        <p style="font-size: 0.75rem; margin-top: 10px; color: #64748b;">Haga clic en el fondo para activar audio.</p>
     </div>
 
-    <!-- SECCIÓN DE HISTORIAL -->
     <div class="history-container">
-        <h2><i class="fas fa-history"></i> Historial de Pedidos Recientes</h2>
+        <h2><i class="fas fa-history"></i> Pedidos Recientes</h2>
         <div style="overflow-x: auto;">
             <table class="history-table">
                 <thead>
@@ -60,17 +71,15 @@
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Total</th>
-                        <th>Pago</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="history-body">
-                    <!-- Se llena con Firebase -->
-                </tbody>
+                <tbody id="history-body"></tbody>
             </table>
         </div>
     </div>
 
+    <!-- AQUÍ SE CARGA EL TICKET -->
     <div id="factura-imprimir"></div>
     <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
@@ -90,133 +99,113 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let yaCargoTodo = false;
-    let baseDeDatos = [];
+    let baseDatosMemoria = [];
 
-    // Escuchar los últimos 20 pedidos
+    // Escuchar últimos 20 pedidos
     const q = query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(20));
 
     onSnapshot(q, (snapshot) => {
-        const hBody = document.getElementById('history-body');
-        hBody.innerHTML = "";
-        baseDeDatos = [];
+        const bodyTable = document.getElementById('history-body');
+        bodyTable.innerHTML = "";
+        baseDatosMemoria = [];
 
         snapshot.docs.forEach((docSnap) => {
-            const p = docSnap.data();
-            const id = docSnap.id;
-            baseDeDatos.push({ id, ...p });
+            const data = docSnap.data();
+            const idDoc = docSnap.id;
+            baseDatosMemoria.push({ id: idDoc, ...data });
 
-            // Rellenar tabla de historial
-            hBody.innerHTML += `
+            bodyTable.innerHTML += `
                 <tr>
-                    <td>${p.fechaTexto.split(',')[0]}<br><small>${p.fechaTexto.split(',')[1]}</small></td>
-                    <td><b>${p.cliente}</b><br><small>${p.direccion.ciudadela}</small></td>
-                    <td style="color:#4ade80; font-weight:bold">$${p.total.toFixed(2)}</td>
-                    <td>${p.pago.toUpperCase()}</td>
+                    <td><small>${data.fechaTexto}</small></td>
+                    <td><b>${data.cliente}</b></td>
+                    <td style="color:#22c55e; font-weight:bold">$${data.total.toFixed(2)}</td>
                     <td>
-                        <button class="btn-action btn-reprint" onclick="window.reimprimir('${id}')"><i class="fas fa-print"></i></button>
-                        <button class="btn-action btn-pdf" onclick="window.generarPDF('${id}')"><i class="fas fa-file-pdf"></i></button>
+                        <button class="btn-action btn-reprint" onclick="window.reimprimir('${idDoc}')">Reimprimir</button>
+                        <button class="btn-action btn-pdf" onclick="window.descargarPDF('${idDoc}')">PDF</button>
                     </td>
                 </tr>
             `;
         });
 
-        // Lógica de Auto-Impresión (Solo para pedidos nuevos)
-        if (!yaCargoTodo) {
-            yaCargoTodo = true;
-            return;
-        }
+        // Solo activar impresión automática para nuevos
+        if (!yaCargoTodo) { yaCargoTodo = true; return; }
 
         snapshot.docChanges().forEach((change) => {
             if (change.type === "added") {
-                const nuevoPedido = change.doc.data();
-                lanzarTicket(nuevoPedido);
+                lanzarImpresora(change.doc.data());
             }
         });
     });
 
-    // FUNCIÓN PRINCIPAL DE TICKET
-    function lanzarTicket(p) {
+    function lanzarImpresora(p) {
         document.getElementById('beep').play().catch(() => {});
         
-        let itemsHtml = "";
+        let prods = "";
         p.items.forEach(i => {
-            itemsHtml += `<div>${i.name.toUpperCase().substring(0,18).padEnd(18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`;
+            prods += `<div>${i.name.toUpperCase().substring(0,18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`;
         });
 
-        const diseño = `
+        const ticketHTML = `
             <div style="width: 280px; padding: 10px; color: black; background: white; font-family: 'Courier Prime', monospace;">
                 <center>
-                    <strong style="font-size: 1.2rem;">MI MINI MARKET</strong><br>
+                    <strong style="font-size: 1.1rem;">MI MINI MARKET</strong><br>
                     BABAHOYO, ECUADOR<br>
                     ---------------------------<br>
-                    <strong>ORDEN DE ENTREGA</strong><br>
+                    <strong>TICKET DE VENTA</strong><br>
                 </center>
                 <br>
                 <b>FECHA:</b> ${p.fechaTexto}<br>
                 <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
-                <b>CDLA:</b> ${p.direccion.ciudadela.toUpperCase()}<br>
+                <b>SECTOR:</b> ${p.direccion.ciudadela.toUpperCase()}<br>
                 <b>MZ:</b> ${p.direccion.manzana} &nbsp; <b>VILLA:</b> ${p.direccion.villa}<br>
                 <b>PAGO:</b> ${p.pago.toUpperCase()}<br>
-                ${p.pagaCon ? '<b>PAGA CON:</b> $' + p.pagaCon : ''}<br>
                 ---------------------------<br>
-                <b>PRODUCTOS:</b><br>
-                ${itemsHtml}
+                ${prods}
                 ---------------------------<br>
-                <strong style="font-size: 1.1rem;">TOTAL A PAGAR: $${p.total.toFixed(2)}</strong><br>
+                <strong style="font-size: 1rem;">TOTAL: $${p.total.toFixed(2)}</strong><br>
                 <br>
-                <center>*** COPIA DE CONTROL ***</center>
+                <center>¡GRACIAS POR COMPRAR!</center>
+                <br>.
             </div>
         `;
 
-        const area = document.getElementById('factura-imprimir');
-        area.innerHTML = diseño;
+        document.getElementById('factura-imprimir').innerHTML = ticketHTML;
 
-        setTimeout(() => { window.print(); }, 1000);
+        // Espera un segundo para asegurar que el navegador cargue el texto
+        setTimeout(() => {
+            window.print();
+        }, 1000);
     }
 
-    // ACCIÓN: REIMPRIMIR
     window.reimprimir = (id) => {
-        const pedido = baseDeDatos.find(p => p.id === id);
-        if(pedido) lanzarTicket(pedido);
+        const pedido = baseDatosMemoria.find(item => item.id === id);
+        if(pedido) lanzarImpresora(pedido);
     };
 
-    // ACCIÓN: GENERAR PDF
-    window.generarPDF = (id) => {
-        const p = baseDeDatos.find(p => p.id === id);
+    window.descargarPDF = (id) => {
+        const p = baseDatosMemoria.find(item => item.id === id);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'mm', format: [80, 150] });
 
         doc.setFont("courier", "bold");
-        doc.setFontSize(12);
         doc.text("MI MINI MARKET", 40, 10, { align: "center" });
-        doc.setFontSize(10);
-        doc.text("ORDEN DE VENTA", 40, 15, { align: "center" });
-        doc.text("--------------------------", 40, 20, { align: "center" });
-
         doc.setFont("courier", "normal");
-        doc.text(`FECHA: ${p.fechaTexto}`, 5, 28);
-        doc.text(`CLIENTE: ${p.cliente}`, 5, 33);
-        doc.text(`CDLA: ${p.direccion.ciudadela}`, 5, 38);
-        doc.text(`MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}`, 5, 43);
-        doc.text(`PAGO: ${p.pago}`, 5, 48);
-        doc.text("--------------------------", 40, 53, { align: "center" });
-
-        let y = 60;
+        doc.setFontSize(9);
+        doc.text(`CLIENTE: ${p.cliente}`, 5, 20);
+        doc.text(`TOTAL: $${p.total.toFixed(2)}`, 5, 25);
+        doc.text(`PAGO: ${p.pago}`, 5, 30);
+        doc.text("-------------------------", 40, 35, { align: "center" });
+        
+        let y = 40;
         p.items.forEach(i => {
-            doc.text(`${i.name.substring(0,15)} x${i.qty}`, 5, y);
-            doc.text(`$${(i.price*i.qty).toFixed(2)}`, 75, y, { align: "right" });
+            doc.text(`${i.name} x${i.qty}`, 5, y);
             y += 5;
         });
 
-        doc.text("--------------------------", 40, y + 2, { align: "center" });
-        doc.setFont("courier", "bold");
-        doc.text(`TOTAL: $${p.total.toFixed(2)}`, 75, y + 8, { align: "right" });
-
-        doc.save(`Pedido_${p.cliente}_${Date.now()}.pdf`);
+        doc.save(`Pedido_${p.cliente}.pdf`);
     };
 
-    document.addEventListener('click', () => { console.log("Audio On"); });
-
+    document.addEventListener('click', () => { console.log("Audio activado"); });
 </script>
 </body>
 </html>
