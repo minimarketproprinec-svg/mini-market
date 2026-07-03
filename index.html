@@ -3,43 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Minimarket Propinec | Tienda Oficial</title>
+    <title>Mega Minimarket Propinec | Tienda</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --py-red: #EF4143; --bg: #F7F7F7; --white: #ffffff; --dark: #292929; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg); color: var(--dark); padding-bottom: 50px; }
-
-        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo-img { height: 45px; width: auto; object-fit: contain; }
-        
+        body { background-color: var(--py-light); color: var(--py-dark); padding-bottom: 50px; }
+        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; }
+        .logo-img { height: 50px; width: auto; object-fit: contain; }
         .cart-trigger { background: var(--py-red); color: white; padding: 8px 15px; border-radius: 20px; font-weight: 700; cursor: pointer; display: flex; gap: 8px; box-shadow: 0 4px 10px rgba(239, 65, 67, 0.3); }
         .search-container { position: relative; }
-        #search-store { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid #e2e2e2; background: #f0f0f0; outline: none; }
+        #search-store { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f0f0f0; outline: none; }
         .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-
         .categories { display: flex; gap: 15px; padding: 15px 5%; overflow-x: auto; scrollbar-width: none; }
-        .categories::-webkit-scrollbar { display: none; }
         .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 85px; }
-        .cat-circle { width: 60px; height: 60px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; }
+        .cat-circle { width: 65px; height: 65px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; }
         .cat-item.active .cat-circle { background: var(--py-red); color: white; }
-        .cat-item span { font-size: 0.7rem; font-weight: 700; text-align: center; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 20px 5%; }
-        .card { background: var(--white); border-radius: 16px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; transition: 0.3s; text-align: center; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; }
-        .card h4 { font-size: 0.8rem; margin: 8px 0 4px; height: 35px; overflow: hidden; }
-        .price { font-size: 1.1rem; font-weight: 800; }
-        .btn-plus { position: absolute; bottom: 10px; right: 10px; background: var(--py-red); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(239,65,67,0.3); }
-
-        #sidebar { position: fixed; right: -100%; top: 0; width: 400px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+        .cat-item span { font-size: 0.7rem; font-weight: 700; text-align: center; color: var(--dark); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px 5% 50px; }
+        .card { background: var(--white); border-radius: 18px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; transition: 0.3s; text-align: center; }
+        .card:hover { transform: translateY(-3px); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; }
+        .card h4 { font-size: 0.8rem; margin: 8px 0 2px; height: 35px; overflow: hidden; line-height: 1.2; }
+        .stock-tag { font-size: 0.65rem; color: #888; margin-bottom: 5px; }
+        .price { font-size: 1.1rem; font-weight: 800; color: var(--dark); }
+        .btn-plus { position: absolute; bottom: 10px; right: 10px; background: var(--py-red); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(239,65,67,0.3); }
+        #sidebar { position: fixed; right: -100%; top: 0; width: 400px; height: 100%; background: white; z-index: 2000; transition: 0.4s ease-in-out; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
         #sidebar.active { right: 0; }
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1500; display:none; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1500; display:none; backdrop-filter: blur(2px); }
         .overlay.active { display:block; }
-        .cart-list { flex: 1; overflow-y: auto; margin: 20px 0; }
-        .btn-checkout { background: var(--py-red); color: white; border: none; padding: 18px; border-radius: 12px; width: 100%; font-weight: 800; cursor: pointer; }
+        .cart-list { flex: 1; overflow-y: auto; padding: 25px; }
+        .cart-item { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .cart-item img { width: 50px; height: 50px; border-radius: 8px; }
+        .btn-checkout { background: var(--py-red); color: white; border: none; padding: 20px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
         @media (max-width: 480px) { #sidebar { width: 100%; } }
     </style>
 </head>
@@ -47,7 +45,7 @@
 
     <header>
         <div class="top-bar">
-            <img src="logo.png" class="logo-img" alt="Mega Propinec">
+            <img src="logo.jpeg" class="logo-img" alt="Logo Propinec">
             <div class="cart-trigger" onclick="toggleCart()">
                 <i class="fas fa-shopping-bag"></i> <span id="cart-counter">0</span>
             </div>
@@ -59,22 +57,20 @@
     </header>
 
     <div class="categories" id="cat-list"></div>
-
     <div class="grid" id="product-grid"></div>
-
     <div class="overlay" id="overlay" onclick="toggleCart()"></div>
 
     <div id="sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-weight:800;">Mi Carrito</h2>
-            <i class="fas fa-times" onclick="toggleCart()" style="font-size:1.5rem; cursor:pointer;"></i>
+        <div style="padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-weight: 800;">Mi Carrito</h2>
+            <i class="fas fa-times" onclick="toggleCart()" style="font-size: 1.5rem; cursor: pointer;"></i>
         </div>
         <div class="cart-list" id="cart-items"></div>
-        <div style="border-top:2px solid #eee; padding-top:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:1.2rem;">
+        <div style="padding: 25px; border-top: 2px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:1.3rem;">
                 <span>Total:</span><span id="total-price">$0.00</span>
             </div>
-            <button class="btn-checkout" onclick="location.href='pago.html'">CONTINUAR</button>
+            <button class="btn-checkout" onclick="location.href='pago.html'">CONTINUAR PEDIDO</button>
         </div>
     </div>
 
@@ -83,12 +79,12 @@
     import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
-      authDomain: "mi-mini-market.firebaseapp.com",
-      projectId: "mi-mini-market",
-      storageBucket: "mi-mini-market.firebasestorage.app",
-      messagingSenderId: "19960510315",
-      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+        authDomain: "mi-mini-market.firebaseapp.com",
+        projectId: "mi-mini-market",
+        storageBucket: "mi-mini-market.firebasestorage.app",
+        messagingSenderId: "19960510315",
+        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -114,8 +110,15 @@
     function renderStore(list) {
         const grid = document.getElementById('product-grid');
         grid.innerHTML = '';
-        list.filter(p => p.visible && p.stock > 0).forEach(p => {
-            grid.innerHTML += `<div class="card"><img src="${p.img}"><h4>${p.name}</h4><p style="font-size:0.7rem; color:gray">Disponibles: ${p.stock}</p><p class="price">$${p.price}</p><button class="btn-plus" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}', ${p.stock})"><i class="fas fa-plus"></i></button></div>`;
+        list.filter(p => p.visible !== false && p.stock > 0).forEach(p => {
+            grid.innerHTML += `
+                <div class="card">
+                    <img src="${p.img}">
+                    <h4>${p.name}</h4>
+                    <p class="stock-tag">Hábiles: <b>${p.stock}</b></p>
+                    <p class="price">$${p.price}</p>
+                    <button class="btn-plus" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}',${p.stock})"><i class="fas fa-plus"></i></button>
+                </div>`;
         });
     }
 
@@ -127,27 +130,38 @@
 
     window.addToCart = (id, name, price, img, max) => {
         const ex = cart.find(i => i.id === id);
-        if(ex && ex.qty >= max) return;
+        if(ex && ex.qty >= max) { Swal.fire('Stock limitado','No hay más unidades disponibles','warning'); return; }
         ex ? ex.qty++ : cart.push({id, name, price, img, qty:1});
         save();
     };
 
     function save() {
         sessionStorage.setItem('market_cart', JSON.stringify(cart));
-        renderCart();
+        renderCartUI();
         document.getElementById('sidebar').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     }
 
-    function renderCart() {
-        let t = 0, c = 0; document.getElementById('cart-items').innerHTML = '';
+    function renderCartUI() {
+        let t = 0, c = 0;
+        const container = document.getElementById('cart-items');
+        container.innerHTML = '';
         cart.forEach((i, idx) => {
             t += i.price * i.qty; c += i.qty;
-            document.getElementById('cart-items').innerHTML += `<div style="display:flex; gap:10px; margin-bottom:15px;"><img src="${i.img}" width="50" style="border-radius:8px"><div><b>${i.name}</b><br><small>$${i.price} x ${i.qty}</small></div></div>`;
+            container.innerHTML += `<div class="cart-item"><img src="${i.img}"><div><b>${i.name}</b><br><small>$${i.price} x ${i.qty}</small></div><div style="margin-left:auto"><button onclick="updateQty(${idx},-1)" style="padding:0 8px">-</button> <button onclick="updateQty(${idx},1)" style="padding:0 8px">+</button></div></div>`;
         });
         document.getElementById('cart-counter').innerText = c;
         document.getElementById('total-price').innerText = `$${t.toFixed(2)}`;
     }
+
+    window.updateQty = (idx, delta) => {
+        const item = cart[idx];
+        const stockActual = allProds.find(p => p.id === item.id).stock;
+        if(delta > 0 && item.qty >= stockActual) return;
+        item.qty += delta;
+        if(item.qty <= 0) cart.splice(idx, 1);
+        save();
+    };
 
     document.getElementById('search-store').oninput = (e) => {
         const term = e.target.value.toLowerCase();
@@ -157,8 +171,9 @@
     window.toggleCart = () => {
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('overlay').classList.toggle('active');
-    }
-    renderCart();
+    };
+    renderCartUI();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
