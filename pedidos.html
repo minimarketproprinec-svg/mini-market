@@ -2,38 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Logística | Mega Propinec</title>
+    <title>Logística | Mini Market Propinec</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --dark: #0f172a; --panel: #1e293b; --orange: #f59e0b; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
+        :root { --dark: #0f172a; --panel: #1e293b; --main: #ff4b4b; --success: #10b981; --way: #3b82f6; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--dark); color: white; min-height: 100vh; padding: 20px; }
-        .monitor-grid { max-width: 1200px; margin: auto; display: grid; grid-template-columns: 1fr; gap: 25px; }
-        .p-card { background: var(--panel); border-radius: 20px; padding: 20px; border: 1px solid #334155; }
+        header { border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .card { background: var(--panel); border-radius: 20px; padding: 25px; border: 1px solid #334155; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; padding: 10px; border-bottom: 1px solid #334155; }
-        td { padding: 15px 10px; font-size: 0.85rem; border-bottom: 1px solid #334155; }
-        .status-btn { padding: 6px 12px; border-radius: 8px; border: none; color: white; cursor: pointer; font-weight: 700; font-size: 0.7rem; margin-right: 5px; }
+        th { text-align: left; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; padding: 12px; }
+        td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #334155; }
+        .st-btn { padding: 6px 12px; border-radius: 8px; border: none; color: white; cursor: pointer; font-weight: 700; font-size: 0.7rem; margin-right: 5px; }
         
-        #master-print { position: fixed; left: -9999px; width: 280px; background: white; color: black; padding: 10px; }
-        @media print { body * { visibility: hidden; } #master-print, #master-print * { visibility: visible; } #master-print { position: absolute; left: 0; top: 0; width: 100%; font-family: 'Courier Prime', monospace; } }
+        #master-print { position: fixed; left: -9999px; width: 280px; background: white; color: black; padding: 10px; font-family: 'Courier Prime', monospace; }
+        @media print { body * { visibility: hidden; } #master-print, #master-print * { visibility: visible; } #master-print { position: absolute; left: 0; top: 0; width: 100%; } @page { margin:0; } }
     </style>
 </head>
 <body>
-    <div class="monitor-grid">
-        <div class="p-card">
-            <h2 style="display:flex; justify-content:space-between; align-items:center;">
-                <span>🚚 DESPACHO DE PEDIDOS</span>
-                <span style="font-size:0.8rem; color:var(--green)">SISTEMA EN VIVO ●</span>
-            </h2>
-            <table>
-                <thead><tr><th>Hora</th><th>Cliente</th><th>Sector</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody id="p-body"></tbody>
-            </table>
-        </div>
+    <header><h2>🚚 CONTROL DE LOGÍSTICA</h2><div style="color:var(--success)">SISTEMA EN VIVO ●</div></header>
+    <div class="card">
+        <table>
+            <thead><tr><th>Hora</th><th>Cliente</th><th>Sector</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody id="p-body"></tbody>
+        </table>
     </div>
     <div id="master-print"></div>
     <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
@@ -45,17 +40,17 @@
     let ready = false, cache = [];
 
     onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "asc"), limit(50)), (snap) => {
-        const body = document.getElementById('p-body'); cache = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        body.innerHTML = [...cache].reverse().map(p => {
-            let color = p.estado==='Preparando'?'var(--orange)':(p.estado==='En camino'?'var(--blue)':'var(--green)');
+        cache = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        document.getElementById('p-body').innerHTML = [...cache].reverse().map(p => {
+            let color = p.estado==='Preparando'?'orange':(p.estado==='En camino'?'var(--way)':'var(--success)');
             return `<tr><td>${p.fechaTexto.split(',')[1]}</td><td><b>${p.cliente.toUpperCase()}</b></td><td>${p.direccion.ciudadela}</td>
             <td><b style="color:${color}">${p.estado}</b></td>
             <td>
-                <button class="status-btn" style="background:var(--orange)" onclick="updE('${p.id}','Preparando')">Prep.</button>
-                <button class="status-btn" style="background:var(--blue)" onclick="updE('${p.id}','En camino')">Ruta</button>
-                <button class="status-btn" style="background:var(--green)" onclick="updE('${p.id}','Entregado')">OK</button>
-                <button class="status-btn" style="background:#475569" onclick="window.reim('${p.id}')"><i class="fas fa-print"></i></button>
-                <button class="status-btn" style="background:var(--red)" onclick="delP('${p.id}')"><i class="fas fa-trash"></i></button>
+                <button class="st-btn" style="background:orange" onclick="updE('${p.id}','Preparando')">Prep.</button>
+                <button class="st-btn" style="background:var(--way)" onclick="updE('${p.id}','En camino')">Ruta</button>
+                <button class="st-btn" style="background:var(--success)" onclick="updE('${p.id}','Entregado')">OK</button>
+                <button class="st-btn" style="background:#475569" onclick="window.reim('${p.id}')"><i class="fas fa-print"></i></button>
+                <button class="st-btn" style="background:var(--main)" onclick="delP('${p.id}')"><i class="fas fa-trash"></i></button>
             </td></tr>`;
         }).join('');
         if (!ready) { ready = true; return; }
@@ -67,10 +62,11 @@
     window.imprimir = (p) => { 
         document.getElementById('beep').play().catch(()=>{});
         let its = p.items.map(i => `<div>${i.name.substring(0,18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`).join('');
-        document.getElementById('master-print').innerHTML = `<center><strong>MEGA PROPRINEC</strong><br>ORDEN DE VENTA<br>-------------------------</center><br>FECHA: ${p.fechaTexto}<br>CLIENTE: ${p.cliente.toUpperCase()}<br>CDLA: ${p.direccion.ciudadela.toUpperCase()}<br>MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}<br>-------------------------<br>${its}<br>-------------------------<br><strong>TOTAL: $${parseFloat(p.total).toFixed(2)}</strong><br><br><center>COPIA DE CONTROL</center>`;
+        document.getElementById('master-print').innerHTML = `<center><strong>MINI MARKET PROPINEC</strong><br>BABAHOYO, ECUADOR<br>-------------------------</center><br>FECHA: ${p.fechaTexto}<br>CLIENTE: ${p.cliente.toUpperCase()}<br>CDLA: ${p.direccion.ciudadela.toUpperCase()}<br>MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}<br>PAGO: ${p.pago}<br>-------------------------<br>${its}<br>-------------------------<br><strong>TOTAL: $${parseFloat(p.total).toFixed(2)}</strong><br><br><center>COPIA DE CONTROL</center>`;
         setTimeout(() => window.print(), 1000); 
     };
     window.reim = (id) => { const p = cache.find(i => i.id === id); if(p) window.imprimir(p); };
+    document.addEventListener('click', () => console.log("Audio ON"));
 </script>
 </body>
 </html>
