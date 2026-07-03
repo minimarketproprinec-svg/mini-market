@@ -1,0 +1,24 @@
+<!-- Reemplaza el bloque <aside> en tu admin.html con este -->
+<aside>
+    <div class="side-h">
+        <img src="logo.jpg" class="logo-erp" onerror="this.src='https://via.placeholder.com/150?text=MINI+MARKET'">
+    </div>
+    
+    <div class="menu-group">
+        <p class="menu-label">Gestión Interna</p>
+        <div class="menu-btn active" onclick="switchT('dash', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div class="menu-btn" onclick="switchT('inv', this)"><i class="fas fa-boxes-stacked"></i> Inventario ERP</div>
+        <div class="menu-btn" onclick="switchT('cat', this)"><i class="fas fa-layer-group"></i> Categorías</div>
+        <div class="menu-btn" onclick="switchT('promos', this)"><i class="fas fa-fire"></i> Gestión Ofertas</div>
+        
+        <p class="menu-label" style="margin-top:20px">Operaciones</p>
+        <!-- ENLACE AL MONITOR DE PEDIDOS -->
+        <div class="menu-btn" onclick="location.href='pedidos.html'"><i class="fas fa-receipt"></i> Monitor Pedidos</div>
+        
+        <p class="menu-label" style="margin-top:20px">Acceso Público</p>
+        <!-- ENLACE A LA TIENDA REAL -->
+        <div class="menu-btn" onclick="window.open('index.html', '_blank')" style="color:var(--success)">
+            <i class="fas fa-store"></i> Ver Tienda
+        </div>
+    </div>
+</aside>
