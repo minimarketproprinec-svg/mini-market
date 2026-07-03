@@ -2,36 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resumen de Pedido | Propinec</title>
+    <title>Pago | Mini Market Propinec</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main-red: #ff4b4b; --bg: #f1f5f9; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
-        .box { background: white; padding: 35px; border-radius: 30px; max-width: 500px; width: 100%; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
-        h2 { font-weight: 800; color: var(--main-red); text-align: center; margin-bottom: 25px; }
-        .summary-card { background: #fff5f5; border-radius: 20px; padding: 20px; border: 1px solid #fee2e2; margin-bottom: 20px; }
-        .sum-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 15px; outline: none; background: #fafafa; }
-        .btn-metodo { width: 100%; padding: 15px; margin: 5px 0; border: 2px solid #eee; border-radius: 15px; cursor: pointer; background: white; font-weight: 700; text-align: left; }
-        .btn-metodo.selected { border-color: var(--main-red); background: #fff5f5; color: var(--main-red); }
-        .btn-final { width: 100%; padding: 22px; background: var(--main-red); color: white; border: none; border-radius: 20px; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 25px; box-shadow: 0 10px 20px rgba(255, 75, 75, 0.2); }
+        body { font-family: 'Poppins', sans-serif; background: #f3f4f6; display: flex; justify-content: center; padding: 20px; }
+        .box { background: white; padding: 30px; border-radius: 25px; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { color: #ff4b4b; text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 12px; outline: none; }
+        .btn-met { width: 100%; padding: 15px; margin: 5px 0; border: 2px solid #eee; border-radius: 12px; cursor: pointer; background: white; font-weight: 700; text-align: left; }
+        .btn-met.selected { border-color: #ff4b4b; background: #fff5f5; color: #ff4b4b; }
+        .btn-f { width: 100%; padding: 20px; background: #ff4b4b; color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 <div class="box">
-    <button onclick="history.back()" style="border:none; background:none; cursor:pointer; color:gray"><i class="fas fa-chevron-left"></i> Volver</button>
-    <h2>CHECKOUT</h2>
-    <div class="summary-card" id="lista-resumen"></div>
-    <input type="text" id="nom" placeholder="Tu Nombre y Apellido">
+    <h2>ENTREGA</h2>
+    <div id="resumen" style="background:#fff5f5; padding:15px; border-radius:15px; margin-bottom:15px"></div>
+    <input type="text" id="nom" placeholder="Nombre completo">
     <input type="text" id="ciu" placeholder="Ciudadela">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px"><input type="text" id="mz" placeholder="Manzana"><input type="text" id="vi" placeholder="Villa"></div>
-    <p style="font-weight:700; margin:10px 0; font-size:0.8rem">Método de Pago</p>
-    <button class="btn-metodo" id="m-e" onclick="sel('Efectivo')">💵 Efectivo al Recibir</button>
-    <button class="btn-metodo" id="m-t" onclick="sel('Transferencia')">🏦 Transferencia Bancaria</button>
-    <p style="font-size:0.7rem; color:gray; margin-top:15px; text-align:center"><i class="fas fa-clock"></i> Entrega estimada: 15 - 30 minutos</p>
-    <button class="btn-final" id="confirmar">CONFIRMAR PEDIDO</button>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px"><input type="text" id="mz" placeholder="Manzana"><input type="text" id="vi" placeholder="Villa"></div>
+    <p style="font-weight:700; margin:10px 0">Pago</p>
+    <button class="btn-met" id="m1" onclick="setM('Efectivo')">💵 Efectivo al recibir</button>
+    <button class="btn-met" id="m2" onclick="setM('Transferencia')">🏦 Transferencia Bancaria</button>
+    <button class="btn-f" id="conf">ENVIAR PEDIDO</button>
 </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -40,21 +33,19 @@
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
     let cart = JSON.parse(sessionStorage.getItem('market_cart')) || [], met = "";
     
-    let sub = 0; cart.forEach(i => sub += i.price*i.qty); let ship = 1.00; let total = sub + ship;
-    document.getElementById('lista-resumen').innerHTML = `<div class="sum-row"><span>Subtotal:</span><b>$${sub.toFixed(2)}</b></div><div class="sum-row"><span>Envío:</span><b>$${ship.toFixed(2)}</b></div><hr style="margin:10px 0; border:none; border-top:1px dashed #ef4444;"><div class="sum-row" style="font-size:1.1rem; color:var(--main-red)"><span>TOTAL:</span><b>$${total.toFixed(2)}</b></div>`;
+    let sub = 0; cart.forEach(i => sub += i.price*i.qty); let total = sub + 1.00;
+    document.getElementById('resumen').innerHTML = `<div style="display:flex; justify-content:space-between"><span>Subtotal:</span><b>$${sub.toFixed(2)}</b></div><div style="display:flex; justify-content:space-between"><span>Envío:</span><b>$1.00</b></div><hr style="margin:5px 0"><div style="display:flex; justify-content:space-between; font-size:1.2rem; color:#ff4b4b"><span>TOTAL:</span><b>$${total.toFixed(2)}</b></div>`;
 
-    window.sel = (m) => { met = m; document.getElementById('m-e').className = m==='Efectivo'?'btn-metodo selected':'btn-metodo'; document.getElementById('m-t').className = m==='Transferencia'?'btn-metodo selected':'btn-metodo'; };
-    
-    document.getElementById('confirmar').onclick = async () => {
+    window.setM = (m) => { met = m; document.getElementById('m1').className = m==='Efectivo'?'btn-met selected':'btn-met'; document.getElementById('m2').className = m==='Transferencia'?'btn-met selected':'btn-met'; };
+    document.getElementById('conf').onclick = async () => {
         const n = document.getElementById('nom').value, c = document.getElementById('ciu').value;
-        if(!n || !c || !met) return alert("Completa tus datos");
-        const btn = document.getElementById('confirmar'); btn.disabled = true; btn.innerText = "PROCESANDO...";
+        if(!n || !c || !met) return alert("Completa los datos");
+        document.getElementById('conf').disabled = true;
         try {
-            for (const i of cart) { const ref = doc(db, "productos", i.id); const sn = await getDoc(ref); if(sn.exists()) await updateDoc(ref, { stock: sn.data().stock - i.qty }); }
-            await addDoc(collection(db, "pedidos"), { cliente: n, items: cart, pago: met, total: total, fecha: Date.now(), fechaTexto: new Date().toLocaleString(), estado: "Preparando", direccion: { ciudadela: c, manzana: document.getElementById('mz').value, villa: document.getElementById('vi').value } });
-            sessionStorage.removeItem('market_cart'); window.open(`https://wa.me/593993252739?text=Nuevo Pedido de ${n}. Total a pagar: $${total.toFixed(2)}`);
-            location.href="index.html";
-        } catch (e) { btn.disabled = false; }
+            for (const i of cart) { const ref = doc(db,"productos",i.id); const s = await getDoc(ref); if(s.exists()) await updateDoc(ref, {stock: s.data().stock - i.qty}); }
+            await addDoc(collection(db,"pedidos"), {cliente: n, items: cart, total: total, pago: met, fecha: Date.now(), fechaTexto: new Date().toLocaleString(), estado: "Preparando", direccion: {ciudadela: c, manzana: document.getElementById('mz').value, villa: document.getElementById('vi').value}});
+            sessionStorage.removeItem('market_cart'); window.open(`https://wa.me/593993252739?text=Nuevo pedido de ${n}`); location.href="index.html";
+        } catch (e) { document.getElementById('conf').disabled = false; }
     };
 </script>
 </body>
