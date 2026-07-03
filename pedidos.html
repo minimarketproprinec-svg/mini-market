@@ -2,290 +2,97 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Proprinec | Control Total</title>
-    
-    <!-- Librerías de Alto Rendimiento -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Courier+Prime&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Monitor Mega Propinec | Auto-Print</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&family=Courier+Prime&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg: #0f172a; --panel: #1e293b; --accent: #22c55e; --error: #f43f5e; --text: #f8fafc; }
+        :root { --dark: #0f172a; --panel: #1e293b; --accent: #22c55e; --error: #f43f5e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
-        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-        /* HEADER DASHBOARD */
-        header { 
-            background: #161e2f; padding: 15px 5%; display: flex; 
-            justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100;
-        }
-        .logo-pro { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; color: #fff; }
-        .conn-status { 
-            background: rgba(34, 197, 94, 0.1); color: var(--accent); padding: 6px 15px; 
-            border-radius: 50px; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--accent);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
-
-        .main-content { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-
-        /* ESTADÍSTICAS (CAJA AUTOMÁTICA) */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--panel); padding: 25px; border-radius: 24px; border: 1px solid #334155; text-align: center; transition: 0.3s; }
-        .stat-card h3 { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-        .stat-card p { font-size: 2.2rem; font-weight: 800; }
-
-        /* TABLA DE HISTORIAL (50 PEDIDOS) */
-        .history-card { background: var(--panel); border-radius: 24px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden; }
-        .table-header { padding: 20px; background: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        body { background: var(--dark); color: white; padding-bottom: 50px; }
+        header { background: #161e2f; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--panel); padding: 25px; border-radius: 24px; border: 1px solid #334155; text-align: center; }
+        .history-card { background: var(--panel); border-radius: 24px; border: 1px solid #334155; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #161e2f; color: #94a3b8; text-align: left; padding: 18px; }
+        td { padding: 18px; border-bottom: 1px solid #334155; }
+        .btn-ui { width: 38px; height: 38px; border-radius: 10px; border: none; cursor: pointer; color: white; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
         
-        .scroll-table { overflow-x: auto; max-height: 600px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #161e2f; color: #94a3b8; text-align: left; padding: 18px; font-size: 0.75rem; text-transform: uppercase; position: sticky; top: 0; z-index: 10; }
-        td { padding: 18px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
-        tr:hover { background: rgba(255,255,255,0.02); }
-
-        /* BOTONES ACCIONES */
-        .action-btns { display: flex; gap: 8px; }
-        .btn-ui { 
-            width: 38px; height: 38px; border-radius: 10px; border: none; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; color: white; transition: 0.2s;
-        }
-        .btn-print { background: #475569; }
-        .btn-pdf { background: #ef4444; }
-        .btn-delete { background: #334155; }
-        .btn-delete:hover { background: var(--error); }
-        .btn-ui:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        /* --- CONFIGURACIÓN DE IMPRESIÓN MAESTRA (CORREGIDA) --- */
-        #master-print-container { 
-            position: fixed; left: -9999px; top: 0; width: 280px; background: white; padding: 0; margin: 0;
-        }
-
-        @media print {
-            body * { visibility: hidden; }
-            #master-print-container, #master-print-container * { visibility: visible; }
-            #master-print-container { 
-                display: block !important; position: absolute; left: 0; top: 0; width: 100%; 
-                margin: 0; padding: 0; background: white; color: black;
-            }
-            @page { margin: 0; size: auto; }
-            html, body { height: auto; overflow: visible; }
-        }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        #master-print-container { position: fixed; left: -9999px; top: 0; width: 280px; background: white; color: black; }
+        @media print { body * { visibility: hidden; } #master-print-container, #master-print-container * { visibility: visible; }
+            #master-print-container { display: block !important; position: absolute; left: 0; top: 0; width: 100%; font-family: 'Courier Prime', monospace !important; }
+            @page { margin: 0; } }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo-pro"><i class="fas fa-rocket"></i> PROPRINEC DASHBOARD</div>
-        <div class="conn-status"><div class="dot"></div> SISTEMA SINCRONIZADO</div>
-    </header>
-
-    <div class="main-content">
-        <!-- CAJA DEL DÍA -->
+    <header><h2 style="font-weight: 800;">DASHBOARD PEDIDOS</h2><div style="color: #4ade80; font-weight: 700;">● SISTEMA SINCRONIZADO</div></header>
+    <div class="container">
         <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Ventas de Hoy</h3>
-                <p id="stats-conteo">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Dinero en Caja</h3>
-                <p id="stats-total">$0.00</p>
-            </div>
+            <div class="stat-card"><h3>Pedidos Hoy</h3><p id="st-count" style="font-size: 2.2rem; font-weight: 800;">0</p></div>
+            <div class="stat-card"><h3>Venta Diaria</h3><p id="st-money" style="font-size: 2.2rem; font-weight: 800;">$0.00</p></div>
         </div>
-
-        <!-- REGISTRO VISUAL (HISTORIAL 50) -->
         <div class="history-card">
-            <div class="table-header">
-                <h2 style="font-size: 1.1rem; font-weight: 700;"><i class="fas fa-receipt"></i> Registro Histórico</h2>
-                <span style="font-size: 0.7rem; color: #4ade80;">Haga clic en el fondo para activar audio 🔔</span>
-            </div>
-            <div class="scroll-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Hora</th>
-                            <th>Cliente / Sector</th>
-                            <th>Forma de Pago</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pedidos-body">
-                        <!-- Sincronizado con Firebase -->
-                    </tbody>
-                </table>
-            </div>
+            <div style="padding:20px"><h3><i class="fas fa-list"></i> Historial Pro (Últimos 50)</h3><small>Haz un clic en la pantalla para sonido 🔊</small></div>
+            <div style="overflow-x: auto;"><table><thead><tr><th>Hora</th><th>Cliente / Sector</th><th>Total</th><th>Acciones</th></tr></thead><tbody id="pedidos-body"></tbody></table></div>
         </div>
     </div>
-
-    <!-- ÁREA DE RENDERIZADO ÚNICO (Para Impresión y PDF) -->
     <div id="master-print-container"></div>
-
-    <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, query, orderBy, limit, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
-        authDomain: "mi-mini-market.firebaseapp.com",
-        projectId: "mi-mini-market",
-        storageBucket: "mi-mini-market.firebasestorage.app",
-        messagingSenderId: "19960510315",
-        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+      authDomain: "mi-mini-market.firebaseapp.com",
+      projectId: "mi-mini-market",
+      storageBucket: "mi-mini-market.firebasestorage.app",
+      messagingSenderId: "19960510315",
+      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    let monitorListo = false;
-    let memoriaLocal = [];
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+    let ready = false, cache = [];
 
-    // --- ESCUCHA DE DATOS (HASTA 50) ---
     onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "asc"), limit(50)), (snap) => {
-        const body = document.getElementById('pedidos-body');
-        memoriaLocal = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        
-        let totalHoy = 0;
-        let cantHoy = 0;
-        const hoy = new Date().toLocaleDateString();
-
-        body.innerHTML = [...memoriaLocal].reverse().map(p => {
-            if(p.fechaTexto.includes(hoy)) {
-                totalHoy += parseFloat(p.total);
-                cantHoy++;
-            }
-            return `
-                <tr>
-                    <td>${p.fechaTexto.split(',')[1] || p.fechaTexto}</td>
-                    <td><b>${p.cliente.toUpperCase()}</b><br><small style="color:#94a3b8"><i class="fas fa-map-marker-alt"></i> ${p.direccion.ciudadela}</small></td>
-                    <td>${p.pago.toUpperCase()}</td>
-                    <td style="color:#22c55e; font-weight:800">$${parseFloat(p.total).toFixed(2)}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-ui btn-print" onclick="window.reimprimir('${p.id}')" title="Reimprimir"><i class="fas fa-print"></i></button>
-                            <button class="btn-ui btn-pdf" onclick="window.descargarPDF('${p.id}')" title="Bajar PDF"><i class="fas fa-file-pdf"></i></button>
-                            <button class="btn-ui btn-delete" onclick="window.borrarHistorial('${p.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
+        const body = document.getElementById('pedidos-body'); cache = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        let totalHoy = 0, cantHoy = 0; const hoy = new Date().toLocaleDateString();
+        body.innerHTML = [...cache].reverse().map(p => {
+            if(p.fechaTexto.includes(hoy)) { totalHoy += p.total; cantHoy++; }
+            return `<tr><td>${p.fechaTexto.split(',')[1]}</td><td><b>${p.cliente.toUpperCase()}</b><br><small style="color:#94a3b8">${p.direccion.ciudadela}</small></td>
+            <td style="color:#22c55e; font-weight:800">$${p.total.toFixed(2)}</td><td><div style="display:flex; gap:5px">
+            <button class="btn-ui" style="background:#475569" onclick="window.reimp('${p.id}')"><i class="fas fa-print"></i></button>
+            <button class="btn-ui" style="background:#ef4444" onclick="window.toPDF('${p.id}')"><i class="fas fa-file-pdf"></i></button>
+            <button class="btn-ui" style="background:#334155" onclick="window.borrar('${p.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`;
         }).join('');
-
-        document.getElementById('stats-conteo').innerText = cantHoy;
-        document.getElementById('stats-total').innerText = `$${totalHoy.toFixed(2)}`;
-
-        if (!monitorListo) { monitorListo = true; return; }
-        
-        snap.docChanges().forEach(change => {
-            if (change.type === "added") window.procesoMaestro(change.doc.data(), true);
-        });
+        document.getElementById('st-count').innerText = cantHoy; document.getElementById('st-money').innerText = `$${totalHoy.toFixed(2)}`;
+        if (!ready) { ready = true; return; }
+        snap.docChanges().forEach(change => { if (change.type === "added") window.printAuto(change.doc.data()); });
     });
 
-    // --- FUNCIÓN MAESTRA DE DISEÑO ---
-    window.prepararDiseño = (p) => {
-        const itemsHtml = p.items.map(i => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:2px">
-                <span>${i.name.toUpperCase().substring(0,18)} x${i.qty}</span>
-                <span>$${(i.price * i.qty).toFixed(2)}</span>
-            </div>
-        `).join('');
-
-        return `
-            <div id="ticket-pos-real" style="width: 260px; padding: 10px; background: white; color: black; font-family: 'Courier Prime', monospace; line-height: 1.1; font-size: 13px;">
-                <center>
-                    <strong style="font-size: 16px;">MI MINI MARKET</strong><br>
-                    BABAHOYO, ECUADOR<br>
-                    ----------------------------<br>
-                    <strong>TICKET DE PEDIDO</strong><br>
-                </center>
-                <br>
-                <b>FECHA:</b> ${p.fechaTexto}<br>
-                <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
-                <b>CDLA:</b> ${p.direccion.ciudadela.toUpperCase()}<br>
-                <b>MZ:</b> ${p.direccion.manzana} &nbsp; <b>VILLA:</b> ${p.direccion.villa}<br>
-                <b>PAGO:</b> ${p.pago.toUpperCase()}<br>
-                ${p.pagaCon ? '<b>PAGA CON:</b> $' + p.pagaCon : ''}<br>
-                ----------------------------<br>
-                <b>DETALLE DE PRODUCTOS:</b><br>
-                ${itemsHtml}
-                ----------------------------<br>
-                <div style="display:flex; justify-content:space-between; font-size: 15px; font-weight: bold;">
-                    <span>TOTAL A PAGAR:</span>
-                    <span>$${parseFloat(p.total).toFixed(2)}</span>
-                </div>
-                <br>
-                <center>*** COPIA DE CONTROL ***</center>
-                <br>
-            </div>`;
+    window.prepararDesign = (p) => {
+        let itemsHtml = p.items.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.name.toUpperCase().substring(0,18)} x${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('');
+        return `<div id="node-pdf" style="width: 260px; padding: 15px; background: white; color: black; font-family: 'Courier Prime', monospace; line-height: 1.1; font-size: 13px;">
+            <center><strong>MEGA MINIMARKET</strong><br>PROPRINEC<br>----------------------------<br><strong>TICKET DE PEDIDO</strong><br></center><br>
+            FECHA: ${p.fechaTexto}<br>CLIENTE: ${p.cliente.toUpperCase()}<br>CDLA: ${p.direccion.ciudadela.toUpperCase()}<br>MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}<br>PAGO: ${p.pago.toUpperCase()}<br>
+            ----------------------------<br>${itemsHtml}----------------------------<br><div style="display:flex; justify-content:space-between; font-size: 15px; font-weight: bold;"><span>TOTAL:</span><span>$${p.total.toFixed(2)}</span></div><br><center>¡GRACIAS POR SU COMPRA!</center></div>`;
     };
 
-    // --- PROCESOS DE SALIDA ---
-    window.procesoMaestro = (pedido, esAuto = false) => {
-        if(esAuto) document.getElementById('notif-sound').play().catch(()=>{});
-        
-        const container = document.getElementById('master-print-container');
-        container.innerHTML = window.prepararDiseño(pedido);
-
-        // Impresión (Sincronizada para evitar blanco)
-        setTimeout(() => {
-            window.print();
-        }, 1000);
+    window.printAuto = (p) => { document.getElementById('beep').play().catch(()=>{}); document.getElementById('master-print-container').innerHTML = window.prepararDesign(p); setTimeout(() => window.print(), 1000); };
+    window.reimp = (id) => { const p = cache.find(i => i.id === id); if(p) window.printAuto(p); };
+    window.borrar = async (id) => { if(prompt("🔐 Clave Admin:") === "2024") await deleteDoc(doc(db, "pedidos", id)); };
+    window.toPDF = async (id) => {
+        const p = cache.find(i => i.id === id); const area = document.getElementById('master-print-container'); area.innerHTML = window.prepararDesign(p); area.style.left = "0";
+        const canvas = await html2canvas(document.querySelector("#node-pdf"), { scale: 3, backgroundColor: "#fff" });
+        const pdf = new jspdf.jsPDF({ orientation: 'p', unit: 'mm', format: [80, (canvas.height * 80) / canvas.width] });
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 80, (canvas.height * 80) / canvas.width);
+        pdf.save(`Ticket_${p.cliente}.pdf`); area.style.left = "-9999px";
     };
-
-    window.reimprimir = (id) => {
-        const p = memoriaLocal.find(item => item.id === id);
-        if(p) window.procesoMaestro(p, false);
-    };
-
-    window.descargarPDF = async (id) => {
-        const p = memoriaLocal.find(item => item.id === id);
-        if(!p) return;
-
-        const container = document.getElementById('master-print-container');
-        container.innerHTML = window.prepararDiseño(p);
-        container.style.left = "0"; // Visible para captura
-
-        try {
-            const canvas = await html2canvas(document.querySelector("#ticket-pos-real"), {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jspdf.jsPDF({
-                orientation: 'p',
-                unit: 'mm',
-                format: [80, (canvas.height * 80) / canvas.width]
-            });
-
-            pdf.addImage(imgData, 'PNG', 0, 0, 80, (canvas.height * 80) / canvas.width);
-            pdf.save(`Pedido_${p.cliente.replace(/\s+/g, '_')}.pdf`);
-        } catch (e) {
-            console.error("Error PDF:", e);
-            alert("No se pudo generar el PDF. Reintente.");
-        } finally {
-            container.style.left = "-9999px"; // Ocultar de nuevo
-        }
-    };
-
-    window.borrarHistorial = async (id) => {
-        const pass = prompt("🔐 Clave de Administrador para ELIMINAR:");
-        if (pass === "2024") {
-            if(confirm("¿Seguro quieres borrar este pedido?")) {
-                await deleteDoc(doc(db, "pedidos", id));
-            }
-        } else { alert("Acceso Denegado"); }
-    };
-
-    document.addEventListener('click', () => { console.log("Canal de audio abierto."); });
+    document.addEventListener('click', () => console.log("Audio Ok"));
 </script>
 </body>
 </html>
