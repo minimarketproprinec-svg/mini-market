@@ -33,14 +33,12 @@
         .nav-bar { background: white; border-top: 1px solid #eee; padding: 10px 5%; overflow-x: auto; scrollbar-width: none; }
         .nav-bar::-webkit-scrollbar { display: none; }
         .nav-links { display: flex; gap: 15px; align-items: center; white-space: nowrap; }
-        .nav-links span { text-decoration: none; color: #444; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; padding: 8px 15px; border-radius: 50px; }
+        .nav-links span { text-decoration: none; color: #444; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; padding: 8px 18px; border-radius: 50px; }
         .nav-links span:hover { color: var(--main); }
-        .btn-cats-top { background: var(--main); color: white !important; font-weight: 700 !important; }
         .hot-label { background: var(--main); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; margin-left: 3px; font-weight: 800; }
 
         @media (max-width: 768px) {
             .nav-links span { background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; }
-            .btn-cats-top { background: var(--main); border: none; }
         }
 
         /* --- CATEGORÍAS ORIGINALES (ICONOS CIRCULARES) --- */
@@ -69,7 +67,7 @@
         .bg-promo { background: var(--main); }
         .bg-best { background: #f59e0b; }
 
-        /* --- ELEMENTOS DE INTERFAZ (SIDEBAR, DRAWER, OVERLAY) --- */
+        /* --- SIDEBAR CARRITO --- */
         #sidebar { position: fixed; right: -100%; top: 0; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
         #sidebar.active { right: 0; }
         @media (max-width: 480px) { #sidebar { width: 100%; } }
@@ -79,10 +77,6 @@
         .qty-btn { width: 28px; height: 28px; border-radius: 8px; border: none; background: white; cursor: pointer; font-weight: 800; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; }
         .qty-btn:hover { background: var(--main); color: white; }
 
-        #drawer { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: white; z-index: 2500; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
-        #drawer.active { left: 0; }
-        .drawer-item { padding: 15px 10px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
-
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1500; display: none; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
     </style>
@@ -90,17 +84,6 @@
 <body>
 
     <div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-    <!-- PANEL LATERAL DE CATEGORÍAS (DRAWER) -->
-    <div id="drawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
-            <h3 style="font-weight:800">Categorías</h3>
-            <i class="fas fa-times" onclick="closeAll()" style="cursor:pointer; font-size: 1.2rem;"></i>
-        </div>
-        <div id="drawer-content">
-            <!-- Dinámico -->
-        </div>
-    </div>
 
     <header>
         <div class="top">
@@ -116,10 +99,9 @@
         </div>
     </header>
 
-    <!-- BARRA DE NAVEGACIÓN FUNCIONAL -->
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav class="nav-bar">
         <div class="nav-links">
-            <span class="btn-cats-top" onclick="toggleDrawer()"><i class="fas fa-bars"></i> Categorías</span>
             <span onclick="filterType('inicio')">Inicio</span>
             <span onclick="filterType('ofertas')">Ofertas <span class="hot-label">HOT</span></span>
             <span onclick="filterType('nuevos')">Nuevos</span>
@@ -152,7 +134,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
@@ -161,17 +143,14 @@
 
     // --- CARGA DE DATOS ---
 
-    // 1. Categorías
+    // 1. Categorías (Solo iconos circulares)
     onSnapshot(query(collection(db, "categorias"), orderBy("nombre", "asc")), (snap) => {
         let iconsHTML = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-c">🏠</div><span>Todos</span></div>`;
-        let drawerHTML = `<div class="drawer-item" onclick="window.filterCat('Todos')">🏠 Todos los productos</div>`;
         snap.forEach(doc => {
             const cat = doc.data();
             iconsHTML += `<div class="cat-item" onclick="window.filterCat('${cat.nombre}', this)"><div class="cat-c">${cat.icono}</div><span>${cat.nombre}</span></div>`;
-            drawerHTML += `<div class="drawer-item" onclick="window.filterCat('${cat.nombre}')"><span>${cat.icono}</span> ${cat.nombre}</div>`;
         });
         document.getElementById('cat-list').innerHTML = iconsHTML;
-        document.getElementById('drawer-content').innerHTML = drawerHTML;
     });
 
     // 2. Productos
@@ -268,6 +247,7 @@
         if(delta === -1 && item.qty === 1) {
             const res = await Swal.fire({
                 title: '¿Eliminar producto?',
+                text: `¿Quieres quitar ${item.name} del carrito?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#ff4b4b',
@@ -276,7 +256,7 @@
             });
             if(res.isConfirmed) cart = cart.filter(x => x.id !== id);
         } else {
-            if(delta === 1 && item.qty >= item.maxStock) return;
+            if(delta === 1 && item.qty >= item.maxStock) return Swal.fire('Límite', 'No hay más unidades', 'info');
             item.qty += delta;
         }
         save();
@@ -319,14 +299,8 @@
         else { s.classList.toggle('active'); o.classList.toggle('active'); }
     };
 
-    window.toggleDrawer = () => {
-        document.getElementById('drawer').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
-    };
-
     window.closeAll = () => {
         document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('drawer').classList.remove('active');
         document.getElementById('overlay').classList.remove('active');
     };
 
