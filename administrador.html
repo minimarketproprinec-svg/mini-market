@@ -2,121 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Mi Mini Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master ERP | Mi Mini Market</title>
+    
+    <!-- Librerías de Nivel Profesional -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        :root { --primary: #2563eb; --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --dark: #1e293b; }
+        :root {
+            --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --dark: #0f172a; --sidebar: #1e293b; --bg: #f1f5f9; --white: #ffffff; --border: #e2e8f0;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        /* Ajuste de pantalla completa para evitar errores de scroll */
-        body { background: #f8fafc; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        header { background: var(--dark); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        
-        .main-content { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden; }
-        
-        /* Formulario lateral */
-        .sidebar { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; }
-        .btn-save { background: var(--success); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-save:hover { background: #1ba952; }
+        body { background: var(--bg); color: var(--dark); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Contenedor de Inventario */
-        .inventory-card { background: white; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        /* Barra de Búsqueda */
-        .search-container { padding: 15px 20px; background: #fff; border-bottom: 1px solid #f1f5f9; }
-        .search-wrapper { position: relative; }
-        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-        #search-input { padding-left: 45px; background: #f8fafc; border: 1px solid #e2e8f0; }
+        /* SIDEBAR */
+        aside { width: 260px; background: var(--sidebar); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 25px; font-weight: 800; font-size: 1.1rem; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 10px; }
+        .sidebar-menu { flex: 1; padding: 15px; }
+        .menu-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 10px; 
+            cursor: pointer; color: #94a3b8; transition: 0.2s; margin-bottom: 5px; 
+        }
+        .menu-item:hover, .menu-item.active { background: var(--primary); color: white; }
 
-        /* Área de Tabla con Scroll Arreglado */
-        .table-area { flex: 1; overflow-y: auto; position: relative; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
-        thead { position: sticky; top: 0; background: #f1f5f9; z-index: 10; }
-        th, td { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; text-align: left; }
-        
-        .p-img { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; background: #eee; }
-        .stock-input { width: 75px; padding: 6px; border-radius: 6px; border: 1px solid transparent; font-weight: 700; text-align: center; }
-        .stock-input:focus { border-color: var(--primary); background: #f0f7ff; outline: none; }
-        
-        /* Alertas de Stock */
-        .low-stock-label { color: var(--danger); font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-top: 4px; display: inline-block; }
-        .row-warning { border-left: 4px solid var(--danger); }
+        /* CONTENIDO */
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        header { height: 70px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0; }
+        .search-bar { background: #f8fafc; border: 1px solid var(--border); padding: 8px 15px; border-radius: 10px; width: 350px; display: flex; align-items: center; gap: 10px; }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; }
 
-        .btn-act { border: none; padding: 8px; border-radius: 6px; cursor: pointer; background: #f1f5f9; transition: 0.2s; }
-        .btn-act:hover { background: #e2e8f0; }
-        .is-hidden { opacity: 0.4; filter: grayscale(1); }
+        .content-area { flex: 1; padding: 25px; overflow-y: auto; }
+        .hidden { display: none !important; }
+
+        /* ESTADISTICAS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        /* TABLA */
+        .table-card { background: white; border-radius: 15px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .table-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 700; border-bottom: 1px solid var(--border); }
+        td { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .p-img { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+        
+        /* SEMAFORO STOCK */
+        .badge { padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 5px; }
+        .bg-success { background: #dcfce7; color: #166534; }
+        .bg-warning { background: #fef9c3; color: #854d0e; }
+        .bg-danger { background: #fee2e2; color: #991b1b; }
+        .bg-out { background: #1e293b; color: white; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
+        .modal-content { background:white; width:450px; padding:25px; border-radius:20px; animation: scaleIn 0.2s ease; }
+        @keyframes scaleIn { from {transform:scale(0.9); opacity:0;} to {transform:scale(1); opacity:1;} }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px; color:#475569; }
+        .form-group input, .form-group select { width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:10px; outline:none; }
+
+        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
 
-<script>
-    const claveCorrecta = "2024"; 
-    const acceso = prompt("🔐 Clave de Administrador:");
-    if (acceso !== claveCorrecta) {
-        alert("Acceso denegado.");
-        window.location.href = "index.html";
-    }
-</script>
+    <aside>
+        <div class="sidebar-header"><i class="fas fa-rocket"></i> PROPRINEC ERP</div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" onclick="switchTab('dash', this)"><i class="fas fa-th-large"></i> Dashboard</div>
+            <div class="menu-item" onclick="switchTab('inv', this)"><i class="fas fa-boxes-stacked"></i> Inventario</div>
+            <div class="menu-item" onclick="location.href='pedidos.html'"><i class="fas fa-print"></i> Monitor de Impresión</div>
+        </div>
+        <div style="padding: 20px; font-size: 0.65rem; color: #64748b; border-top: 1px solid #334155;">SISTEMA CONECTADO A LA NUBE</div>
+    </aside>
 
-<header>
-    <h2><i class="fas fa-boxes"></i> Panel de Inventario</h2>
-    <div style="text-align: right">
-        <span id="low-stock-alert" style="color: #ff9f9f; font-weight: bold; margin-right: 15px;"></span>
-        <small style="color: #4ade80;"><i class="fas fa-circle"></i> Sincronizado</small>
-    </div>
-</header>
+    <main>
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search" style="color:#94a3b8"></i>
+                <input type="text" id="mainSearch" placeholder="Buscar por nombre o categoría..." oninput="searchFunc(this.value)">
+            </div>
+            <div style="display:flex; align-items:center; gap:15px">
+                <div style="text-align:right"><p style="font-size:0.8rem; font-weight:700">Administrador</p><p style="font-size:0.65rem; color:var(--success)">● En Línea</p></div>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" style="width:38px; border-radius:10px">
+            </div>
+        </header>
 
-<div class="main-content">
-    <div class="sidebar">
-        <h3>Añadir Producto</h3>
-        <input type="text" id="p-name" placeholder="Nombre del producto">
-        <input type="number" id="p-price" step="0.01" placeholder="Precio de venta ($)">
-        <input type="number" id="p-stock" placeholder="Cantidad inicial">
-        <select id="p-cat">
-            <option value="Abarrotes">Abarrotes</option>
-            <option value="Bebidas">Bebidas</option>
-            <option value="Carnes">Carnes</option>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Otros">Otros</option>
-        </select>
-        <input type="file" id="p-img" accept="image/*">
-        <button class="btn-save" id="btn-save"><i class="fas fa-cloud-upload-alt"></i> GUARDAR PRODUCTO</button>
-        <p style="font-size: 0.75rem; color: #64748b; margin-top: 10px;">* El sistema evitará nombres duplicados automáticamente.</p>
-    </div>
+        <div class="content-area">
+            
+            <!-- DASHBOARD -->
+            <div id="tab-dash">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#eff6ff; color:var(--primary)"><i class="fas fa-dollar-sign"></i></div>
+                        <div><h3>Ventas Hoy</h3><p id="st-ventas">$0.00</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#ecfdf5; color:var(--success)"><i class="fas fa-box"></i></div>
+                        <div><h3>Productos</h3><p id="st-prods">0</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fffbeb; color:var(--warning)"><i class="fas fa-bell"></i></div>
+                        <div><h3>Stock Bajo</h3><p id="st-low">0</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fef2f2; color:var(--danger)"><i class="fas fa-times-circle"></i></div>
+                        <div><h3>Agotados</h3><p id="st-out">0</p></div>
+                    </div>
+                </div>
 
-    <div class="inventory-card">
-        <!-- BUSCADOR -->
-        <div class="search-container">
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Buscar producto por nombre para aumentar stock...">
+                <div class="table-card">
+                    <div class="table-header"><h3>Últimos Pedidos Registrados</h3></div>
+                    <table>
+                        <thead><tr><th>Fecha</th><th>Cliente</th><th>Pago</th><th>Total</th></tr></thead>
+                        <tbody id="pedidos-recientes-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- INVENTARIO -->
+            <div id="tab-inv" class="hidden">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Gestión de Inventario Real</h3>
+                        <button class="btn-p" onclick="openM()"><i class="fas fa-plus"></i> NUEVO</button>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table>
+                            <thead><tr><th>Foto</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+                            <tbody id="inv-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FORMULARIO MODAL -->
+    <div class="modal" id="modalInv">
+        <div class="modal-content">
+            <h3 style="margin-bottom:20px">Nuevo Producto</h3>
+            <div class="form-group"><label>Nombre</label><input type="text" id="n-name"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div class="form-group"><label>Precio</label><input type="number" id="n-price" step="0.01"></div>
+                <div class="form-group"><label>Stock</label><input type="number" id="n-stock"></div>
+            </div>
+            <div class="form-group">
+                <label>Categoría</label>
+                <select id="n-cat">
+                    <option>Abarrotes</option><option>Bebidas</option><option>Carnes</option><option>Limpieza</option><option>Lácteos</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Imagen</label><input type="file" id="n-img" accept="image/*"></div>
+            <div style="display:flex; gap:10px; margin-top:20px">
+                <button class="btn-p" style="flex:1; justify-content:center" onclick="guardar()">GUARDAR</button>
+                <button onclick="closeM()" style="flex:1; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer">CANCELAR</button>
             </div>
         </div>
-
-        <!-- TABLA CON SCROLL -->
-        <div class="table-area">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Descripción</th>
-                        <th>Precio ($)</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-list"></tbody>
-            </table>
-        </div>
     </div>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
@@ -129,104 +182,98 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const prodsCol = collection(db, "productos");
+    let masterInv = [];
 
-    let allProducts = []; // Copia local para búsqueda y duplicados
+    // LOGIN
+    const pin = prompt("🔐 Acceso Administrador:");
+    if(pin !== "2024") { location.href="index.html"; }
 
-    // ESCUCHAR DATOS
-    onSnapshot(prodsCol, (snap) => {
-        allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderInventory(allProducts);
+    // TAB NAVIGATION
+    window.switchTab = (id, el) => {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('tab-dash').classList.add('hidden');
+        document.getElementById('tab-inv').classList.add('hidden');
+        document.getElementById(`tab-${id}`).classList.remove('hidden');
+    }
+
+    // CARGAR PRODUCTOS
+    onSnapshot(collection(db, "productos"), (snap) => {
+        masterInv = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        renderInv(masterInv);
+        updateDash();
     });
 
-    // GUARDAR PRODUCTO (CON VALIDACIÓN DE DUPLICADOS)
-    document.getElementById('btn-save').onclick = async () => {
-        const name = document.getElementById('p-name').value.trim();
-        const price = document.getElementById('p-price').value;
-        const stock = document.getElementById('p-stock').value;
-        const file = document.getElementById('p-img').files[0];
-
-        if(!name || !price || !stock) return alert("Por favor, rellena los campos necesarios.");
-
-        // VALIDAR DUPLICADO
-        const duplicado = allProducts.find(p => p.name.toLowerCase() === name.toLowerCase());
-        if(duplicado) {
-            alert(`⚠️ ADVERTENCIA: El producto "${name}" ya existe en el inventario. Úsa el buscador para aumentar su stock.`);
-            return;
-        }
-
-        const img = file ? await compress(file) : "https://via.placeholder.com/100";
+    // CARGAR PEDIDOS (RESUMEN)
+    onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(10)), (snap) => {
+        const body = document.getElementById('pedidos-recientes-body');
+        let totalHoy = 0; const hoy = new Date().toLocaleDateString();
         
-        await addDoc(prodsCol, {
-            name: name, price: price, stock: parseInt(stock),
-            img: img, visible: true, category: document.getElementById('p-cat').value
-        });
+        body.innerHTML = snap.docs.map(d => {
+            const p = d.data();
+            if(p.fechaTexto && p.fechaTexto.includes(hoy)) totalHoy += p.total;
+            return `<tr><td>${p.fechaTexto}</td><td><b>${p.cliente}</b></td><td>${p.pago}</td><td style="color:var(--success); font-weight:700">$${parseFloat(p.total).toFixed(2)}</td></tr>`;
+        }).join('');
+        document.getElementById('st-ventas').innerText = `$${totalHoy.toFixed(2)}`;
+    });
 
-        alert("Producto registrado correctamente.");
-        document.getElementById('p-name').value = '';
-        document.getElementById('p-price').value = '';
-        document.getElementById('p-stock').value = '';
-        document.getElementById('p-img').value = '';
-    };
+    function renderInv(list) {
+        const body = document.getElementById('inv-body'); body.innerHTML = '';
+        list.forEach(p => {
+            let b = 'bg-success', ic = 'fa-check-circle';
+            if(p.stock <= 0) { b = 'bg-out'; ic='fa-times-circle'; }
+            else if(p.stock < 10) { b = 'bg-danger'; ic='fa-exclamation-triangle'; }
+            else if(p.stock < 20) { b = 'bg-warning'; ic='fa-clock'; }
 
-    // FUNCIÓN PARA RENDERIZAR
-    function renderInventory(products) {
-        const list = document.getElementById('inventory-list');
-        list.innerHTML = '';
-        let countLow = 0;
-
-        products.forEach(p => {
-            const tr = document.createElement('tr');
-            const isLow = p.stock < 5;
-            if(isLow) { tr.classList.add('row-warning'); countLow++; }
-            if(!p.visible) tr.classList.add('is-hidden');
-
-            tr.innerHTML = `
-                <td><img src="${p.img}" class="p-img"></td>
-                <td><b>${p.name}</b><br><small style="color:gray">${p.category}</small></td>
-                <td><input type="number" step="0.01" class="stock-input" value="${p.price}" onchange="updateValue('${p.id}', 'price', this.value)"></td>
-                <td>
-                    <input type="number" class="stock-input" style="color: ${isLow ? 'red' : 'black'}" value="${p.stock}" onchange="updateValue('${p.id}', 'stock', this.value)">
-                    ${isLow ? '<br><span class="low-stock-label">BAJO STOCK</span>' : ''}
-                </td>
-                <td>
-                    <button class="btn-act" onclick="updateValue('${p.id}', 'visible', ${!p.visible})"><i class="fas ${p.visible?'fa-eye':'fa-eye-slash'}"></i></button>
-                    <button class="btn-act" style="color:var(--danger)" onclick="deleteItem('${p.id}')"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            list.appendChild(tr);
-        });
-        document.getElementById('low-stock-alert').innerText = countLow > 0 ? `⚠️ ${countLow} productos por agotarse` : '';
-    }
-
-    // BUSCADOR EN TIEMPO REAL
-    document.getElementById('search-input').oninput = (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
-        renderInventory(filtered);
-    };
-
-    window.updateValue = (id, field, val) => {
-        const finalVal = field === 'stock' ? parseInt(val) : (field === 'visible' ? val : val);
-        updateDoc(doc(db, "productos", id), { [field]: finalVal });
-    };
-
-    window.deleteItem = (id) => confirm("¿Deseas eliminar este producto permanentemente?") && deleteDoc(doc(db, "productos", id));
-
-    async function compress(file) {
-        return new Promise(res => {
-            const r = new FileReader(); r.readAsDataURL(file);
-            r.onload = e => {
-                const i = new Image(); i.src = e.target.result;
-                i.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 300; canvas.height = 300;
-                    canvas.getContext('2d').drawImage(i, 0, 0, 300, 300);
-                    res(canvas.toDataURL('image/jpeg', 0.6));
-                };
-            };
+            body.innerHTML += `
+                <tr>
+                    <td><img src="${p.img}" class="p-img"></td>
+                    <td><b>${p.name.toUpperCase()}</b><br><small style="color:gray">${p.id.substring(0,6)}</small></td>
+                    <td><span style="font-size:0.7rem; font-weight:700">${p.category}</span></td>
+                    <td>$${p.price}</td>
+                    <td><span class="badge ${b}"><i class="fas ${ic}"></i> ${p.stock} UNID.</span></td>
+                    <td>
+                        <button onclick="editStock('${p.id}', ${p.stock})" style="border:none; background:#f1f5f9; padding:8px; border-radius:8px; cursor:pointer"><i class="fas fa-pen"></i></button>
+                        <button onclick="delP('${p.id}')" style="border:none; background:#fee2e2; color:var(--danger); padding:8px; border-radius:8px; cursor:pointer; margin-left:5px"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
         });
     }
+
+    function updateDash() {
+        document.getElementById('st-prods').innerText = masterInv.length;
+        document.getElementById('st-low').innerText = masterInv.filter(p => p.stock > 0 && p.stock < 20).length;
+        document.getElementById('st-out').innerText = masterInv.filter(p => p.stock <= 0).length;
+    }
+
+    window.searchFunc = (v) => {
+        const filtered = masterInv.filter(p => p.name.toLowerCase().includes(v.toLowerCase()) || p.category.toLowerCase().includes(v.toLowerCase()));
+        renderInv(filtered);
+    }
+
+    window.guardar = async () => {
+        const n = document.getElementById('n-name').value, p = document.getElementById('n-price').value, s = document.getElementById('n-stock').value, file = document.getElementById('n-img').files[0];
+        if(!n || !p || !s || !file) return Swal.fire('Error','Faltan datos','error');
+        
+        const r = new FileReader(); r.readAsDataURL(file);
+        r.onload = async () => {
+            await addDoc(collection(db, "productos"), { name: n, price: p, stock: parseInt(s), category: document.getElementById('n-cat').value, img: r.result, visible: true });
+            closeM(); Swal.fire('Éxito','Producto subido','success');
+        };
+    }
+
+    window.editStock = async (id, actual) => {
+        const { value: ns } = await Swal.fire({ title:'Nuevo Stock', input:'number', inputValue:actual, showCancelButton:true });
+        if(ns) await updateDoc(doc(db, "productos", id), { stock: parseInt(ns) });
+    }
+
+    window.delP = async (id) => {
+        const res = await Swal.fire({ title:'¿Eliminar?', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar' });
+        if(res.isConfirmed) await deleteDoc(doc(db, "productos", id));
+    }
+
+    window.openM = () => document.getElementById('modalInv').style.display='flex';
+    window.closeM = () => document.getElementById('modalInv').style.display='none';
 </script>
 </body>
 </html>
