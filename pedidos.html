@@ -2,71 +2,251 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Logística | Mini Market Propinec</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística y Despacho | MINI PROPRINEC SYSTEM</title>
+    
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Scripts para PDF e Impresión -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        :root { --dark: #0f172a; --panel: #1e293b; --main: #ff4b4b; --success: #10b981; --way: #3b82f6; }
+        :root { 
+            --main: #ff4b4b; 
+            --dark: #0f172a; 
+            --bg: #f1f5f9; 
+            --success: #10b981; 
+            --way: #3b82f6; 
+            --border: #e2e8f0;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--dark); color: white; min-height: 100vh; padding: 20px; }
-        header { border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .card { background: var(--panel); border-radius: 20px; padding: 25px; border: 1px solid #334155; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; padding: 12px; }
-        td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #334155; }
-        .st-btn { padding: 6px 12px; border-radius: 8px; border: none; color: white; cursor: pointer; font-weight: 700; font-size: 0.7rem; margin-right: 5px; }
+        body { background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+        /* HEADER */
+        header { 
+            background: white; padding: 15px 30px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .status-live { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: var(--success); }
+        .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* CONTENIDO */
+        .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }
         
-        #master-print { position: fixed; left: -9999px; width: 280px; background: white; color: black; padding: 10px; font-family: 'Courier Prime', monospace; }
-        @media print { body * { visibility: hidden; } #master-print, #master-print * { visibility: visible; } #master-print { position: absolute; left: 0; top: 0; width: 100%; } @page { margin:0; } }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 800; border-bottom: 1px solid var(--border); }
+        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+        /* ESTADOS */
+        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .bg-prep { background: #fff7ed; color: #c2410c; }
+        .bg-way { background: #eff6ff; color: #1d4ed8; }
+        .bg-ok { background: #ecfdf5; color: #047857; }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-group { display: flex; gap: 5px; }
+        .btn-action { 
+            width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; color: white;
+        }
+        .btn-prep { background: #f59e0b; }
+        .btn-way { background: var(--way); }
+        .btn-ok { background: var(--success); }
+        .btn-print { background: var(--dark); }
+        .btn-del { background: var(--main); }
+        .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* --- PLANTILLA ÚNICA DE TICKET (OCULTA) --- */
+        #master-ticket { 
+            width: 80mm; padding: 10mm 5mm; background: white; color: black;
+            position: fixed; left: -1000px; top: 0;
+            font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.2;
+        }
+        .t-header { text-align: center; margin-bottom: 10px; }
+        .t-divider { border-top: 1px dashed #000; margin: 10px 0; }
+        .t-item { display: flex; justify-content: space-between; margin-bottom: 3px; }
+        .t-total { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; margin-top: 5px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #master-ticket, #master-ticket * { visibility: visible; }
+            #master-ticket { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <header><h2>🚚 CONTROL DE LOGÍSTICA</h2><div style="color:var(--success)">SISTEMA EN VIVO ●</div></header>
-    <div class="card">
-        <table>
-            <thead><tr><th>Hora</th><th>Cliente</th><th>Sector</th><th>Estado</th><th>Acción</th></tr></thead>
-            <tbody id="p-body"></tbody>
-        </table>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo.jpg" style="height: 40px;" onerror="this.style.display='none'">
+            <h2 style="font-weight: 800; letter-spacing: -1px;">CONTROL DE LOGÍSTICA</h2>
+        </div>
+        <div class="status-live">
+            <div class="dot"></div> SISTEMA EN VIVO
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Ubicación</th>
+                        <th>Pago</th>
+                        <th>Estado</th>
+                        <th>Acciones de Despacho</th>
+                    </tr>
+                </thead>
+                <tbody id="p-body">
+                    <!-- Pedidos dinámicos -->
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div id="master-print"></div>
+
+    <!-- AUDIO PARA NUEVOS PEDIDOS -->
     <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <!-- CONTENEDOR DE TICKET ÚNICO -->
+    <div id="master-ticket">
+        <div class="t-header">
+            <strong id="t-negocio">MINI MARKET PROPINEC</strong><br>
+            <span id="t-eslogan">"Donde más barato es"</span><br>
+            <span id="t-direccion">Babahoyo, Ecuador</span><br>
+            <span id="t-tel">Tel: 0993252739</span>
+        </div>
+        <div class="t-divider"></div>
+        <div>
+            FECHA: <span id="t-fecha"></span><br>
+            CLIENTE: <span id="t-cliente"></span><br>
+            DIR: <span id="t-dir"></span>
+        </div>
+        <div class="t-divider"></div>
+        <div id="t-items">
+            <!-- Items dinámicos -->
+        </div>
+        <div class="t-divider"></div>
+        <div class="t-item"><span>SUBTOTAL:</span> <span id="t-sub"></span></div>
+        <div class="t-item"><span>ENVÍO:</span> <span>$1.00</span></div>
+        <div class="t-total"><span>TOTAL:</span> <span id="t-total"></span></div>
+        <div class="t-divider"></div>
+        <div style="text-align: center;">
+            PAGO: <span id="t-pago"></span><br>
+            <strong id="t-billete"></strong><br><br>
+            ¡GRACIAS POR SU COMPRA!
+        </div>
+    </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, limit, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
     const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
-    let ready = false, cache = [];
 
-    onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "asc"), limit(50)), (snap) => {
-        cache = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        document.getElementById('p-body').innerHTML = [...cache].reverse().map(p => {
-            let color = p.estado==='Preparando'?'orange':(p.estado==='En camino'?'var(--way)':'var(--success)');
-            return `<tr><td>${p.fechaTexto.split(',')[1]}</td><td><b>${p.cliente.toUpperCase()}</b></td><td>${p.direccion.ciudadela}</td>
-            <td><b style="color:${color}">${p.estado}</b></td>
-            <td>
-                <button class="st-btn" style="background:orange" onclick="updE('${p.id}','Preparando')">Prep.</button>
-                <button class="st-btn" style="background:var(--way)" onclick="updE('${p.id}','En camino')">Ruta</button>
-                <button class="st-btn" style="background:var(--success)" onclick="updE('${p.id}','Entregado')">OK</button>
-                <button class="st-btn" style="background:#475569" onclick="window.reim('${p.id}')"><i class="fas fa-print"></i></button>
-                <button class="st-btn" style="background:var(--main)" onclick="delP('${p.id}')"><i class="fas fa-trash"></i></button>
-            </td></tr>`;
-        }).join('');
+    let ready = false;
+    let pedidosCache = [];
+
+    // 1. Escuchar pedidos en tiempo real
+    onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(50)), (snap) => {
+        pedidosCache = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        
+        renderPedidos(pedidosCache);
+
         if (!ready) { ready = true; return; }
-        snap.docChanges().forEach(ch => { if (ch.type === "added") window.imprimir(ch.doc.data()); });
+
+        // Alertar sobre nuevos pedidos
+        snap.docChanges().forEach(change => {
+            if (change.type === "added") {
+                document.getElementById('beep').play().catch(e => console.log("Audio requiere interacción"));
+                generarTicket(change.doc.data(), true); // Auto-imprimir al llegar
+            }
+        });
     });
 
-    window.updE = async (id, e) => await updateDoc(doc(db, "pedidos", id), { estado: e });
-    window.delP = async (id) => prompt("Clave:") === "2024" && await deleteDoc(doc(db, "pedidos", id));
-    window.imprimir = (p) => { 
-        document.getElementById('beep').play().catch(()=>{});
-        let its = p.items.map(i => `<div>${i.name.substring(0,18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`).join('');
-        document.getElementById('master-print').innerHTML = `<center><strong>MINI MARKET PROPINEC</strong><br>BABAHOYO, ECUADOR<br>-------------------------</center><br>FECHA: ${p.fechaTexto}<br>CLIENTE: ${p.cliente.toUpperCase()}<br>CDLA: ${p.direccion.ciudadela.toUpperCase()}<br>MZ: ${p.direccion.manzana} VILLA: ${p.direccion.villa}<br>PAGO: ${p.pago}<br>-------------------------<br>${its}<br>-------------------------<br><strong>TOTAL: $${parseFloat(p.total).toFixed(2)}</strong><br><br><center>COPIA DE CONTROL</center>`;
-        setTimeout(() => window.print(), 1000); 
+    function renderPedidos(lista) {
+        document.getElementById('p-body').innerHTML = lista.map(p => {
+            let badgeClass = p.estado === 'Preparando' ? 'bg-prep' : (p.estado === 'En camino' ? 'bg-way' : 'bg-ok');
+            return `
+            <tr>
+                <td><small>${p.fechaTexto ? p.fechaTexto.split(',')[1] : 'Reciente'}</small></td>
+                <td><b>${p.cliente.toUpperCase()}</b></td>
+                <td><small>${p.direccion.ciudadela}<br>Mz ${p.direccion.manzana} Vlla ${p.direccion.villa}</small></td>
+                <td><span class="badge bg-ok" style="background:#f1f5f9; color:#475569">$${p.total.toFixed(2)} (${p.pago})</span></td>
+                <td><span class="badge ${badgeClass}">${p.estado}</span></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn-action btn-prep" title="Preparando" onclick="updEstado('${p.id}','Preparando')"><i class="fas fa-box"></i></button>
+                        <button class="btn-action btn-way" title="En camino" onclick="updEstado('${p.id}','En camino')"><i class="fas fa-motorcycle"></i></button>
+                        <button class="btn-action btn-ok" title="Entregado" onclick="updEstado('${p.id}','Entregado')"><i class="fas fa-check"></i></button>
+                        <button class="btn-action btn-print" title="Reimprimir Ticket" onclick="reimprimir('${p.id}')"><i class="fas fa-print"></i></button>
+                        <button class="btn-action btn-del" title="Eliminar" onclick="eliminarPedido('${p.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // 2. Lógica Dinámica de Ticket Único
+    window.generarTicket = (p, autoPrint = false) => {
+        // Llenar campos dinámicos
+        document.getElementById('t-fecha').innerText = p.fechaTexto;
+        document.getElementById('t-cliente').innerText = p.cliente.toUpperCase();
+        document.getElementById('t-dir').innerText = `${p.direccion.ciudadela}, Mz ${p.direccion.manzana} Vlla ${p.direccion.villa}`;
+        document.getElementById('t-pago').innerText = p.pago.toUpperCase();
+        document.getElementById('t-billete').innerText = (p.pago === 'Efectivo' && p.billete) ? `PAGA CON: ${p.billete}` : '';
+        
+        let subtotal = p.total - 1.00;
+        document.getElementById('t-sub').innerText = `$${subtotal.toFixed(2)}`;
+        document.getElementById('t-total').innerText = `$${p.total.toFixed(2)}`;
+
+        // Llenar lista de productos
+        let itemsHtml = p.items.map(i => `
+            <div class="t-item">
+                <span>${i.qty} x ${i.name.substring(0,18)}</span>
+                <span>$${(i.price * i.qty).toFixed(2)}</span>
+            </div>
+        `).join('');
+        document.getElementById('t-items').innerHTML = itemsHtml;
+
+        if(autoPrint) {
+            setTimeout(() => window.print(), 800);
+        }
     };
-    window.reim = (id) => { const p = cache.find(i => i.id === id); if(p) window.imprimir(p); };
-    document.addEventListener('click', () => console.log("Audio ON"));
+
+    window.reimprimir = (id) => {
+        const ped = pedidosCache.find(x => x.id === id);
+        if(ped) generarTicket(ped, true);
+    };
+
+    window.updEstado = async (id, nuevoE) => {
+        await updateDoc(doc(db, "pedidos", id), { estado: nuevoE });
+    };
+
+    window.eliminarPedido = async (id) => {
+        const pss = prompt("Clave de seguridad para eliminar:");
+        if(pss === "2024") {
+            await deleteDoc(doc(db, "pedidos", id));
+            Swal.fire("Eliminado", "El pedido ha sido borrado del historial", "success");
+        }
+    };
+
+    // Activar audio en el primer clic
+    document.addEventListener('click', () => {
+        const audio = document.getElementById('beep');
+        audio.play().then(() => { audio.pause(); audio.currentTime = 0; });
+    }, { once: true });
+
 </script>
 </body>
 </html>
