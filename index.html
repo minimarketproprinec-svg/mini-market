@@ -3,213 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Minimarket Propinec | Tienda</title>
+    <title>Tienda | Mini Market Propinec</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main-red: #ff4b4b; --bg-gray: #f8f9fa; --text-dark: #1a1a1a; --white: #ffffff; }
+        :root { --main: #ff4b4b; --bg: #f8f9fa; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-gray); color: var(--text-dark); padding-bottom: 30px; }
-        
-        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo-img { height: 55px; cursor: pointer; transition: 0.3s; }
-        .logo-img:hover { transform: scale(1.05); }
-        
-        .cart-trigger { background: var(--main-red); color: white; padding: 10px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(255, 75, 75, 0.3); }
-        
-        .search-box { position: relative; }
-        #search-store { width: 100%; padding: 14px 20px 14px 50px; border-radius: 15px; border: 1px solid #eee; background: #f1f3f5; outline: none; transition: 0.3s; }
-        #search-store:focus { border-color: var(--main-red); background: white; }
-        .search-box i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #adb5bd; }
-
-        .categories { display: flex; gap: 20px; padding: 25px 5%; overflow-x: auto; scrollbar-width: none; margin-bottom: 10px; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 90px; }
-        .cat-circle { width: 70px; height: 70px; background: var(--white); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; border: 2px solid transparent; }
-        .cat-item.active .cat-circle { background: var(--main-red); color: white; border-color: var(--main-red); transform: translateY(-5px); }
-        .cat-item span { font-size: 0.75rem; font-weight: 700; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; padding: 0 5% 50px; }
-        .card { background: var(--white); border-radius: 24px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); position: relative; transition: 0.4s; text-align: center; border: 1px solid #f1f1f1; }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: var(--main-red); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 18px; margin-bottom: 10px; }
-        .card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; height: 40px; overflow: hidden; }
-        .pres { font-size: 0.7rem; color: #888; margin-bottom: 5px; font-weight: 600; }
-        .price { font-size: 1.2rem; font-weight: 800; color: var(--main-red); }
-        
-        .btn-add { position: absolute; bottom: 15px; right: 15px; background: var(--main-red); color: white; width: 40px; height: 40px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.3rem; box-shadow: 0 5px 15px rgba(255, 75, 75, 0.4); }
-
-        /* Sidebar Cart */
-        #sidebar { position: fixed; right: -100%; top: 0; width: 400px; height: 100%; background: white; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; padding: 30px; box-shadow: -10px 0 40px rgba(0,0,0,0.1); }
+        body { background: var(--bg); padding-bottom: 80px; }
+        header { background: white; padding: 15px 5%; position: sticky; top:0; z-index:1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .logo-img { height: 45px; }
+        .cart-trigger { background: var(--main); color: white; padding: 8px 15px; border-radius: 50px; cursor: pointer; font-weight: 700; display: flex; gap: 10px; }
+        .search-box { position: relative; width: 100%; }
+        #search { width: 100%; padding: 12px 15px 12px 40px; border-radius: 12px; border: 1px solid #eee; background: #f1f3f5; outline: none; }
+        .search-box i { position: absolute; left: 15px; top: 13px; color: #888; }
+        .cats { display: flex; gap: 15px; padding: 20px 5%; overflow-x: auto; scrollbar-width: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; cursor: pointer; transition: 0.3s; }
+        .cat-c { width: 60px; height: 60px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .cat-item.active .cat-c { background: var(--main); color: white; transform: scale(1.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 5%; }
+        .card { background: white; border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; position: relative; border: 1px solid #f1f1f1; }
+        .card:hover { transform: translateY(-5px); border-color: var(--main); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
+        .card h4 { font-size: 0.8rem; height: 35px; overflow: hidden; }
+        .price { font-size: 1.1rem; font-weight: 800; color: var(--main); }
+        .btn-add { position: absolute; bottom: 10px; right: 10px; background: var(--main); color: white; width: 35px; height: 35px; border-radius: 12px; border: none; cursor: pointer; }
+        #sidebar { position: fixed; right: -100%; top: 0; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
         #sidebar.active { right: 0; }
         .cart-list { flex: 1; overflow-y: auto; margin: 20px 0; }
-        .empty-cart { text-align: center; padding: 40px 0; color: #ccc; }
-        .empty-cart i { font-size: 4rem; display: block; margin-bottom: 10px; }
-        .btn-checkout { background: var(--main-red); color: white; border: none; padding: 20px; border-radius: 20px; width: 100%; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
-        .btn-checkout:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1500; display: none; backdrop-filter: blur(4px); }
+        .btn-check { background: var(--main); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; cursor: pointer; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1500; display: none; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
-
-        @media (max-width: 480px) { #sidebar { width: 100%; } }
     </style>
 </head>
 <body>
-
     <header>
-        <div class="top-bar">
-            <img src="logo.jpeg" class="logo-img" alt="Mega Propinec" onclick="location.reload()">
-            <div class="cart-trigger" onclick="toggleCart()">
-                <i class="fas fa-shopping-bag"></i> <span id="cart-count">0</span>
-            </div>
-        </div>
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-store" placeholder="Buscar en Mega Minimarket...">
-        </div>
+        <div class="top"><img src="logo.jpg" class="logo-img" alt="Propinec"><div class="cart-trigger" onclick="toggleCart()"><i class="fas fa-shopping-bag"></i> <span id="count">0</span></div></div>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="search" placeholder="¿Qué buscas hoy?"></div>
     </header>
-
-    <div class="categories" id="cat-list">
-        <!-- Categorías Dinámicas -->
-    </div>
-
-    <div class="grid" id="product-grid">
-        <!-- Productos -->
-    </div>
-
+    <div class="cats" id="cat-list"></div>
+    <div class="grid" id="product-grid"></div>
     <div class="overlay" id="overlay" onclick="toggleCart()"></div>
-
     <div id="sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-weight:800;">Mi Carrito</h2>
-            <i class="fas fa-times" onclick="toggleCart()" style="font-size:1.5rem; cursor:pointer; color:#ccc;"></i>
-        </div>
-        <div class="cart-list" id="cart-items">
-            <!-- Items del carrito -->
-        </div>
-        <div style="border-top:2px dashed #f1f1f1; padding-top:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:1.4rem;">
-                <span>Total:</span><span id="total-price" style="color:var(--main-red)">$0.00</span>
-            </div>
-            <button class="btn-checkout" id="btn-to-pay" onclick="location.href='pago.html'">CONTINUAR PAGO</button>
-        </div>
+        <div style="display:flex; justify-content:space-between"><h3>Mi Pedido</h3><i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer"></i></div>
+        <div class="cart-list" id="cart-items"></div>
+        <div style="padding-top:20px; border-top:1px solid #eee"><div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.2rem"><span>Total:</span><span id="total-p">$0.00</span></div><button class="btn-check" onclick="location.href='pago.html'">CONTINUAR</button></div>
     </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
-      authDomain: "mi-mini-market.firebaseapp.com",
-      projectId: "mi-mini-market",
-      storageBucket: "mi-mini-market.firebasestorage.app",
-      messagingSenderId: "19960510315",
-      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app);
     let allProds = [], cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
 
-    // Cargar Categorías
     onSnapshot(query(collection(db, "categorias"), orderBy("nombre", "asc")), (snap) => {
-        let html = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-circle"><i class="fas fa-grid-2"></i>🏠</div><span>Todos</span></div>`;
-        snap.forEach(doc => {
-            const c = doc.data();
-            html += `<div class="cat-item" onclick="window.filterCat('${c.nombre}', this)"><div class="cat-circle">${c.icono}</div><span>${c.nombre}</span></div>`;
-        });
-        document.getElementById('cat-list').innerHTML = html;
+        let h = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-c">🏠</div><span>Todos</span></div>`;
+        snap.forEach(d => { h += `<div class="cat-item" onclick="window.filterCat('${d.data().nombre}', this)"><div class="cat-c">${d.data().icono}</div><span>${d.data().nombre}</span></div>`; });
+        document.getElementById('cat-list').innerHTML = h;
     });
 
-    // Cargar Productos
     onSnapshot(collection(db, "productos"), (snap) => {
         allProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        renderStore(allProds);
+        renderS(allProds);
     });
 
-    function renderStore(list) {
-        const grid = document.getElementById('product-grid');
-        grid.innerHTML = '';
+    function renderS(list) {
+        const grid = document.getElementById('product-grid'); grid.innerHTML = '';
         list.filter(p => p.visible !== false && p.stock > 0).forEach(p => {
-            grid.innerHTML += `
-                <div class="card">
-                    <img src="${p.img}">
-                    <h4>${p.name}</h4>
-                    <p class="pres">${p.presentation || 'C/U'}</p>
-                    <p class="price">$${parseFloat(p.price).toFixed(2)}</p>
-                    <button class="btn-add" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}',${p.stock})"><i class="fas fa-plus"></i></button>
-                </div>`;
+            let pr = p.promoActive ? `<small style="text-decoration:line-through; color:gray">$${p.price}</small><br>$${p.promoPrice}` : `$${p.price}`;
+            grid.innerHTML += `<div class="card">${p.destacado ? '⭐':''}<img src="${p.img}"><h4>${p.name}</h4><small style="color:gray">Habiles: ${p.stock}</small><p class="price">${pr}</p><button class="btn-add" onclick="addC('${p.id}','${p.name}',${p.promoActive?p.promoPrice:p.price},'${p.img}',${p.stock})">+</button></div>`;
         });
     }
 
-    window.filterCat = (cat, btn) => {
-        document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        renderStore(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat));
-    };
-
-    window.addToCart = (id, name, price, img, max) => {
-        const ex = cart.find(i => i.id === id);
-        if(ex && ex.qty >= max) return;
-        ex ? ex.qty++ : cart.push({id, name, price, img, qty:1});
+    window.addC = (id, n, p, i, max) => {
+        const ex = cart.find(x => x.id === id); if(ex && ex.qty >= max) return;
+        ex ? ex.qty++ : cart.push({id, name: n, price: p, img: i, qty: 1});
         save();
-    };
-
-    function save() {
-        sessionStorage.setItem('market_cart', JSON.stringify(cart));
-        renderCartUI();
-        document.getElementById('sidebar').classList.add('active');
-        document.getElementById('overlay').classList.add('active');
     }
 
-    function renderCartUI() {
-        let t = 0, c = 0;
-        const container = document.getElementById('cart-items');
-        if(cart.length === 0) {
-            container.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-basket"></i><p>Tu carrito está vacío</p></div>`;
-            document.getElementById('btn-to-pay').disabled = true;
-        } else {
-            container.innerHTML = '';
-            document.getElementById('btn-to-pay').disabled = false;
-            cart.forEach((i, idx) => {
-                t += i.price * i.qty; c += i.qty;
-                container.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${i.img}" style="width:60px; height:60px; border-radius:12px; object-fit:cover;">
-                        <div style="flex:1">
-                            <b style="font-size:0.85rem">${i.name}</b><br>
-                            <span style="color:var(--main-red); font-weight:800">$${(i.price*i.qty).toFixed(2)}</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:10px; background:#f1f3f5; padding:5px 10px; border-radius:12px;">
-                            <button onclick="updateQty(${idx},-1)" style="border:none; background:none; cursor:pointer">-</button>
-                            <b style="font-size:0.9rem">${i.qty}</b>
-                            <button onclick="updateQty(${idx},1)" style="border:none; background:none; cursor:pointer">+</button>
-                        </div>
-                    </div>`;
-            });
-        }
-        document.getElementById('cart-count').innerText = c;
-        document.getElementById('total-price').innerText = `$${t.toFixed(2)}`;
+    function save() { sessionStorage.setItem('market_cart', JSON.stringify(cart)); renderC(); document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+    function renderC() {
+        let t = 0, c = 0; document.getElementById('cart-items').innerHTML = cart.map((i,idx) => {
+            t += i.price * i.qty; c += i.qty;
+            return `<div style="display:flex; gap:10px; margin-bottom:15px"><img src="${i.img}" width="50" style="border-radius:10px"><div><b>${i.name}</b><br><small>$${i.price} x ${i.qty}</small></div></div>`;
+        }).join('');
+        document.getElementById('count').innerText = c; document.getElementById('total-p').innerText = `$${t.toFixed(2)}`;
     }
-
-    window.updateQty = (idx, delta) => {
-        const item = cart[idx];
-        const stockActual = allProds.find(p => p.id === item.id).stock;
-        if(delta > 0 && item.qty >= stockActual) return;
-        item.qty += delta;
-        if(item.qty <= 0) cart.splice(idx, 1);
-        save();
-    };
-
-    document.getElementById('search-store').oninput = (e) => {
-        renderStore(allProds.filter(p => p.name.toLowerCase().includes(e.target.value.toLowerCase())));
-    };
-
-    window.toggleCart = () => {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
-    }
-    renderCartUI();
+    window.filterCat = (cat, btn) => { document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active')); btn.classList.add('active'); renderS(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat)); };
+    document.getElementById('search').oninput = (e) => renderS(allProds.filter(p => p.name.toLowerCase().includes(e.target.value.toLowerCase())));
+    window.toggleCart = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+    renderC();
 </script>
 </body>
 </html>
