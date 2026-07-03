@@ -58,6 +58,17 @@
         .bg-danger { background: #fee2e2; color: #991b1b; }
         .bg-out { background: #1e293b; color: white; }
 
+        /* ESTILO PRODUCTO OCULTO */
+        .is-hidden { opacity: 0.4; background: #f8fafc; }
+        .badge-hidden { background: #f1f5f9; color: #64748b; }
+
+        /* BOTONES ACCIÓN */
+        .btn-action { border:none; padding:8px; border-radius:8px; cursor:pointer; transition: 0.2s; }
+        .btn-edit { background:#f1f5f9; color: var(--dark); }
+        .btn-eye { background:#eff6ff; color: var(--primary); }
+        .btn-eye.off { background:#f1f5f9; color: #94a3b8; }
+        .btn-delete { background:#fee2e2; color:var(--danger); }
+
         /* MODAL */
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
         .modal-content { background:white; width:450px; padding:25px; border-radius:20px; animation: scaleIn 0.2s ease; }
@@ -78,7 +89,7 @@
             <div class="menu-item" onclick="switchTab('inv', this)"><i class="fas fa-boxes-stacked"></i> Inventario</div>
             <div class="menu-item" onclick="location.href='pedidos.html'"><i class="fas fa-print"></i> Monitor de Impresión</div>
         </div>
-        <div style="padding: 20px; font-size: 0.65rem; color: #64748b; border-top: 1px solid #334155;">SISTEMA CONECTADO A LA NUBE</div>
+        <div style="padding: 20px; font-size: 0.65rem; color: #64748b; border-top: 1px solid #334155;">V 2.0 • Babahoyo Cloud</div>
     </aside>
 
     <main>
@@ -111,17 +122,19 @@
                         <div><h3>Stock Bajo</h3><p id="st-low">0</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#fef2f2; color:var(--danger)"><i class="fas fa-times-circle"></i></div>
-                        <div><h3>Agotados</h3><p id="st-out">0</p></div>
+                        <div class="stat-icon" style="background:#fef2f2; color:var(--danger)"><i class="fas fa-eye-slash"></i></div>
+                        <div><h3>Ocultos</h3><p id="st-hidden">0</p></div>
                     </div>
                 </div>
 
                 <div class="table-card">
-                    <div class="table-header"><h3>Últimos Pedidos Registrados</h3></div>
-                    <table>
-                        <thead><tr><th>Fecha</th><th>Cliente</th><th>Pago</th><th>Total</th></tr></thead>
-                        <tbody id="pedidos-recientes-body"></tbody>
-                    </table>
+                    <div class="table-header"><h3>Actividad de Ventas (Últimos 10)</h3></div>
+                    <div style="overflow-x:auto">
+                        <table>
+                            <thead><tr><th>Fecha / Hora</th><th>Cliente</th><th>Pago</th><th>Total</th></tr></thead>
+                            <tbody id="pedidos-recientes-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -129,12 +142,12 @@
             <div id="tab-inv" class="hidden">
                 <div class="table-card">
                     <div class="table-header">
-                        <h3>Gestión de Inventario Real</h3>
-                        <button class="btn-p" onclick="openM()"><i class="fas fa-plus"></i> NUEVO</button>
+                        <h3>Gestión de Productos</h3>
+                        <button class="btn-p" onclick="openM()"><i class="fas fa-plus"></i> AGREGAR PRODUCTO</button>
                     </div>
                     <div style="overflow-x:auto">
                         <table>
-                            <thead><tr><th>Foto</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+                            <thead><tr><th>Foto</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock / Estado</th><th>Acciones</th></tr></thead>
                             <tbody id="inv-body"></tbody>
                         </table>
                     </div>
@@ -147,22 +160,22 @@
     <!-- FORMULARIO MODAL -->
     <div class="modal" id="modalInv">
         <div class="modal-content">
-            <h3 style="margin-bottom:20px">Nuevo Producto</h3>
-            <div class="form-group"><label>Nombre</label><input type="text" id="n-name"></div>
+            <h3 style="margin-bottom:20px; font-weight:800">📦 Registro de Producto</h3>
+            <div class="form-group"><label>Nombre del Producto</label><input type="text" id="n-name" placeholder="Ej: Leche Chocolatada"></div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                <div class="form-group"><label>Precio</label><input type="number" id="n-price" step="0.01"></div>
-                <div class="form-group"><label>Stock</label><input type="number" id="n-stock"></div>
+                <div class="form-group"><label>Precio Venta</label><input type="number" id="n-price" step="0.01"></div>
+                <div class="form-group"><label>Stock Inicial</label><input type="number" id="n-stock"></div>
             </div>
             <div class="form-group">
                 <label>Categoría</label>
                 <select id="n-cat">
-                    <option>Abarrotes</option><option>Bebidas</option><option>Carnes</option><option>Limpieza</option><option>Lácteos</option>
+                    <option>Abarrotes</option><option>Bebidas</option><option>Carnes</option><option>Limpieza</option><option>Lácteos</option><option>Golosinas</option>
                 </select>
             </div>
             <div class="form-group"><label>Imagen</label><input type="file" id="n-img" accept="image/*"></div>
             <div style="display:flex; gap:10px; margin-top:20px">
-                <button class="btn-p" style="flex:1; justify-content:center" onclick="guardar()">GUARDAR</button>
-                <button onclick="closeM()" style="flex:1; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer">CANCELAR</button>
+                <button class="btn-p" style="flex:1; justify-content:center" onclick="guardar()">GUARDAR EN NUBE</button>
+                <button onclick="closeM()" style="flex:1; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer; font-weight:600">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -184,11 +197,11 @@
     const db = getFirestore(app);
     let masterInv = [];
 
-    // LOGIN
-    const pin = prompt("🔐 Acceso Administrador:");
+    // LOGIN SEGURIDAD
+    const pin = prompt("🔐 Acceso Maestro Proprinec:");
     if(pin !== "2024") { location.href="index.html"; }
 
-    // TAB NAVIGATION
+    // TAB NAVEGACIÓN
     window.switchTab = (id, el) => {
         document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
@@ -197,14 +210,14 @@
         document.getElementById(`tab-${id}`).classList.remove('hidden');
     }
 
-    // CARGAR PRODUCTOS
+    // CARGAR PRODUCTOS EN TIEMPO REAL
     onSnapshot(collection(db, "productos"), (snap) => {
         masterInv = snap.docs.map(d => ({id: d.id, ...d.data()}));
         renderInv(masterInv);
         updateDash();
     });
 
-    // CARGAR PEDIDOS (RESUMEN)
+    // CARGAR HISTORIAL RECIENTE
     onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(10)), (snap) => {
         const body = document.getElementById('pedidos-recientes-body');
         let totalHoy = 0; const hoy = new Date().toLocaleDateString();
@@ -212,7 +225,7 @@
         body.innerHTML = snap.docs.map(d => {
             const p = d.data();
             if(p.fechaTexto && p.fechaTexto.includes(hoy)) totalHoy += p.total;
-            return `<tr><td>${p.fechaTexto}</td><td><b>${p.cliente}</b></td><td>${p.pago}</td><td style="color:var(--success); font-weight:700">$${parseFloat(p.total).toFixed(2)}</td></tr>`;
+            return `<tr><td>${p.fechaTexto}</td><td><b>${p.cliente.toUpperCase()}</b></td><td>${p.pago.toUpperCase()}</td><td style="color:var(--success); font-weight:800">$${parseFloat(p.total).toFixed(2)}</td></tr>`;
         }).join('');
         document.getElementById('st-ventas').innerText = `$${totalHoy.toFixed(2)}`;
     });
@@ -225,16 +238,30 @@
             else if(p.stock < 10) { b = 'bg-danger'; ic='fa-exclamation-triangle'; }
             else if(p.stock < 20) { b = 'bg-warning'; ic='fa-clock'; }
 
+            const rowClass = p.visible === false ? 'is-hidden' : '';
+
             body.innerHTML += `
-                <tr>
+                <tr class="${rowClass}">
                     <td><img src="${p.img}" class="p-img"></td>
-                    <td><b>${p.name.toUpperCase()}</b><br><small style="color:gray">${p.id.substring(0,6)}</small></td>
-                    <td><span style="font-size:0.7rem; font-weight:700">${p.category}</span></td>
-                    <td>$${p.price}</td>
-                    <td><span class="badge ${b}"><i class="fas ${ic}"></i> ${p.stock} UNID.</span></td>
+                    <td><b>${p.name.toUpperCase()}</b><br><small style="color:gray">SKU: ${p.id.substring(0,6)}</small></td>
+                    <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:8px; font-size:0.7rem; font-weight:800; color:#64748b">${p.category}</span></td>
+                    <td style="font-weight:700">$${parseFloat(p.price).toFixed(2)}</td>
                     <td>
-                        <button onclick="editStock('${p.id}', ${p.stock})" style="border:none; background:#f1f5f9; padding:8px; border-radius:8px; cursor:pointer"><i class="fas fa-pen"></i></button>
-                        <button onclick="delP('${p.id}')" style="border:none; background:#fee2e2; color:var(--danger); padding:8px; border-radius:8px; cursor:pointer; margin-left:5px"><i class="fas fa-trash"></i></button>
+                        <span class="badge ${b}"><i class="fas ${ic}"></i> ${p.stock} UNID.</span><br>
+                        ${p.visible === false ? '<small style="color:var(--danger); font-weight:800">OCULTO AL CLIENTE</small>' : ''}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:5px">
+                            <button class="btn-action btn-eye ${p.visible === false ? 'off' : ''}" onclick="toggleVis('${p.id}', ${p.visible})" title="Ocultar/Mostrar">
+                                <i class="fas ${p.visible === false ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                            </button>
+                            <button class="btn-action btn-edit" onclick="editStock('${p.id}', ${p.stock})" title="Ajustar Stock">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="btn-action btn-delete" onclick="delP('${p.id}')" title="Borrar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
         });
@@ -243,7 +270,13 @@
     function updateDash() {
         document.getElementById('st-prods').innerText = masterInv.length;
         document.getElementById('st-low').innerText = masterInv.filter(p => p.stock > 0 && p.stock < 20).length;
-        document.getElementById('st-out').innerText = masterInv.filter(p => p.stock <= 0).length;
+        document.getElementById('st-hidden').innerText = masterInv.filter(p => p.visible === false).length;
+    }
+
+    // ACCIONES
+    window.toggleVis = async (id, currentStatus) => {
+        await updateDoc(doc(db, "productos", id), { visible: !currentStatus });
+        Swal.fire({ icon: 'info', title: 'Visibilidad Actualizada', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
     }
 
     window.searchFunc = (v) => {
@@ -253,22 +286,46 @@
 
     window.guardar = async () => {
         const n = document.getElementById('n-name').value, p = document.getElementById('n-price').value, s = document.getElementById('n-stock').value, file = document.getElementById('n-img').files[0];
-        if(!n || !p || !s || !file) return Swal.fire('Error','Faltan datos','error');
+        if(!n || !p || !s || !file) return Swal.fire('Atención','Faltan datos o imagen','warning');
         
         const r = new FileReader(); r.readAsDataURL(file);
         r.onload = async () => {
-            await addDoc(collection(db, "productos"), { name: n, price: p, stock: parseInt(s), category: document.getElementById('n-cat').value, img: r.result, visible: true });
-            closeM(); Swal.fire('Éxito','Producto subido','success');
+            await addDoc(collection(db, "productos"), { 
+                name: n, 
+                price: parseFloat(p).toFixed(2), 
+                stock: parseInt(s), 
+                category: document.getElementById('n-cat').value, 
+                img: r.result, 
+                visible: true 
+            });
+            closeM(); 
+            Swal.fire('Guardado','El producto ya está en la nube','success');
         };
     }
 
     window.editStock = async (id, actual) => {
-        const { value: ns } = await Swal.fire({ title:'Nuevo Stock', input:'number', inputValue:actual, showCancelButton:true });
-        if(ns) await updateDoc(doc(db, "productos", id), { stock: parseInt(ns) });
+        const { value: ns } = await Swal.fire({ 
+            title: 'Ajuste Manual de Unidades', 
+            input: 'number', 
+            inputLabel: 'Ingrese la nueva cantidad total',
+            inputValue: actual, 
+            showCancelButton: true,
+            confirmButtonColor: '#2563eb'
+        });
+        if (ns !== undefined && ns !== "") {
+            await updateDoc(doc(db, "productos", id), { stock: parseInt(ns) });
+        }
     }
 
     window.delP = async (id) => {
-        const res = await Swal.fire({ title:'¿Eliminar?', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar' });
+        const res = await Swal.fire({ 
+            title: '¿Eliminar producto?', 
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning', 
+            showCancelButton: true, 
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Sí, borrar definitivamente' 
+        });
         if(res.isConfirmed) await deleteDoc(doc(db, "productos", id));
     }
 
