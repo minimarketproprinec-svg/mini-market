@@ -2,50 +2,227 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pago | Mini Market Propinec</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra | Mini Market Propinec</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #f3f4f6; display: flex; justify-content: center; padding: 20px; }
-        .box { background: white; padding: 30px; border-radius: 25px; max-width: 480px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        h2 { color: #ff4b4b; text-align: center; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 12px; outline: none; }
-        .btn-met { width: 100%; padding: 15px; margin: 5px 0; border: 2px solid #eee; border-radius: 12px; cursor: pointer; background: white; font-weight: 700; text-align: left; }
-        .btn-met.selected { border-color: #ff4b4b; background: #fff5f5; color: #ff4b4b; }
-        .btn-f { width: 100%; padding: 20px; background: #ff4b4b; color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        :root { --main: #ff4b4b; --bg: #f8f9fa; --dark: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding: 20px; }
+
+        .checkout-container { max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+        
+        .header { text-align: center; margin-bottom: 25px; }
+        .header img { height: 50px; margin-bottom: 10px; }
+        .header h2 { font-weight: 800; font-size: 1.5rem; color: var(--dark); }
+
+        /* Resumen */
+        .resumen-box { background: #fff5f5; padding: 20px; border-radius: 18px; margin-bottom: 25px; border: 1px dashed var(--main); }
+        .resumen-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .total-row { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,75,75,0.2); font-weight: 800; font-size: 1.2rem; color: var(--main); }
+
+        /* Formulario */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; color: #64748b; }
+        input { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(255,75,75,0.1); }
+
+        /* Métodos de Pago */
+        .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .method-card { 
+            border: 2px solid #f1f5f9; padding: 15px; border-radius: 15px; cursor: pointer; text-align: center; 
+            transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; font-weight: 700; font-size: 0.8rem;
+        }
+        .method-card i { font-size: 1.5rem; }
+        .method-card.active { border-color: var(--main); background: #fff5f5; color: var(--main); }
+
+        /* Dinámico */
+        .dynamic-info { margin-top: 20px; display: none; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .bank-details { background: #f8fafc; padding: 15px; border-radius: 12px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
+
+        .btn-confirm { 
+            width: 100%; padding: 20px; background: var(--main); color: white; border: none; border-radius: 18px; 
+            font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 30px; transition: 0.3s; box-shadow: 0 10px 20px rgba(255,75,75,0.2); 
+        }
+        .btn-confirm:hover { transform: translateY(-2px); background: #e63e3e; }
+        .btn-confirm:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
     </style>
 </head>
 <body>
-<div class="box">
-    <h2>ENTREGA</h2>
-    <div id="resumen" style="background:#fff5f5; padding:15px; border-radius:15px; margin-bottom:15px"></div>
-    <input type="text" id="nom" placeholder="Nombre completo">
-    <input type="text" id="ciu" placeholder="Ciudadela">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px"><input type="text" id="mz" placeholder="Manzana"><input type="text" id="vi" placeholder="Villa"></div>
-    <p style="font-weight:700; margin:10px 0">Pago</p>
-    <button class="btn-met" id="m1" onclick="setM('Efectivo')">💵 Efectivo al recibir</button>
-    <button class="btn-met" id="m2" onclick="setM('Transferencia')">🏦 Transferencia Bancaria</button>
-    <button class="btn-f" id="conf">ENVIAR PEDIDO</button>
+
+<div class="checkout-container">
+    <div class="header">
+        <img src="logo.jpg" onerror="this.src='https://via.placeholder.com/150?text=PROPINEC'">
+        <h2>Finalizar Pedido</h2>
+    </div>
+
+    <div class="resumen-box" id="resumen">
+        <!-- Generado por JS -->
+    </div>
+
+    <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" id="nom" placeholder="Ej. Odalis Cardenas">
+    </div>
+
+    <div class="form-group">
+        <label>Sector / Ciudadela</label>
+        <input type="text" id="ciu" placeholder="Ej. Babahoyo">
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+        <div class="form-group">
+            <label>Manzana (Mz)</label>
+            <input type="text" id="mz" placeholder="Ej. 12">
+        </div>
+        <div class="form-group">
+            <label>Villa</label>
+            <input type="text" id="vi" placeholder="Ej. 4">
+        </div>
+    </div>
+
+    <label style="margin-top:10px">Método de Pago</label>
+    <div class="payment-methods">
+        <div class="method-card" id="m-efectivo" onclick="setMethod('Efectivo')">
+            <i class="fas fa-money-bill-wave"></i> Efectivo
+        </div>
+        <div class="method-card" id="m-transfe" onclick="setMethod('Transferencia')">
+            <i class="fas fa-university"></i> Transferencia
+        </div>
+    </div>
+
+    <!-- Sección dinámica Efectivo -->
+    <div id="info-efectivo" class="dynamic-info">
+        <div class="form-group">
+            <label>¿Con cuánto vas a pagar? (Opcional)</label>
+            <input type="number" id="billete" placeholder="Ej. $10, $20...">
+        </div>
+    </div>
+
+    <!-- Sección dinámica Transferencia -->
+    <div id="info-transfe" class="dynamic-info">
+        <div class="bank-details">
+            <p><strong>Banco:</strong> Banco Pichincha</p>
+            <p><strong>Tipo:</strong> Ahorros</p>
+            <p><strong>Número:</strong> 2208123456</p>
+            <p><strong>Titular:</strong> Mini Market Propinec</p>
+            <p style="margin-top:10px; font-size:0.7rem; color:var(--main)">* Envía el comprobante por WhatsApp tras confirmar.</p>
+        </div>
+    </div>
+
+    <button class="btn-confirm" id="conf">CONFIRMAR PEDIDO</button>
+    <p style="text-align:center; font-size:0.75rem; color:#94a3b8; margin-top:15px">Tu pedido se enviará directamente a nuestro WhatsApp.</p>
 </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getFirestore, collection, addDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
     const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
-    let cart = JSON.parse(sessionStorage.getItem('market_cart')) || [], met = "";
     
-    let sub = 0; cart.forEach(i => sub += i.price*i.qty); let total = sub + 1.00;
-    document.getElementById('resumen').innerHTML = `<div style="display:flex; justify-content:space-between"><span>Subtotal:</span><b>$${sub.toFixed(2)}</b></div><div style="display:flex; justify-content:space-between"><span>Envío:</span><b>$1.00</b></div><hr style="margin:5px 0"><div style="display:flex; justify-content:space-between; font-size:1.2rem; color:#ff4b4b"><span>TOTAL:</span><b>$${total.toFixed(2)}</b></div>`;
+    let cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
+    let met = "";
+    
+    // Calcular totales
+    let sub = 0; cart.forEach(i => sub += i.price * i.qty);
+    let envio = 1.00;
+    let total = sub + envio;
 
-    window.setM = (m) => { met = m; document.getElementById('m1').className = m==='Efectivo'?'btn-met selected':'btn-met'; document.getElementById('m2').className = m==='Transferencia'?'btn-met selected':'btn-met'; };
+    // Renderizar resumen
+    document.getElementById('resumen').innerHTML = `
+        <div class="resumen-row"><span>Productos (${cart.length}):</span><b>$${sub.toFixed(2)}</b></div>
+        <div class="resumen-row"><span>Costo de Envío:</span><b>$${envio.toFixed(2)}</b></div>
+        <div class="total-row"><span>TOTAL A PAGAR:</span><b>$${total.toFixed(2)}</b></div>
+    `;
+
+    // Selección de método
+    window.setMethod = (m) => {
+        met = m;
+        document.getElementById('m-efectivo').classList.toggle('active', m === 'Efectivo');
+        document.getElementById('m-transfe').classList.toggle('active', m === 'Transferencia');
+        
+        document.getElementById('info-efectivo').style.display = m === 'Efectivo' ? 'block' : 'none';
+        document.getElementById('info-transfe').style.display = m === 'Transferencia' ? 'block' : 'none';
+    };
+
+    // Botón Confirmar
     document.getElementById('conf').onclick = async () => {
-        const n = document.getElementById('nom').value, c = document.getElementById('ciu').value;
-        if(!n || !c || !met) return alert("Completa los datos");
+        const nom = document.getElementById('nom').value;
+        const ciu = document.getElementById('ciu').value;
+        const mz = document.getElementById('mz').value;
+        const vi = document.getElementById('vi').value;
+        const billete = document.getElementById('billete').value;
+
+        if(!nom || !ciu || !met) {
+            return Swal.fire('Atención', 'Por favor completa tu nombre, dirección y método de pago', 'warning');
+        }
+
         document.getElementById('conf').disabled = true;
+        document.getElementById('conf').innerText = "PROCESANDO...";
+
         try {
-            for (const i of cart) { const ref = doc(db,"productos",i.id); const s = await getDoc(ref); if(s.exists()) await updateDoc(ref, {stock: s.data().stock - i.qty}); }
-            await addDoc(collection(db,"pedidos"), {cliente: n, items: cart, total: total, pago: met, fecha: Date.now(), fechaTexto: new Date().toLocaleString(), estado: "Preparando", direccion: {ciudadela: c, manzana: document.getElementById('mz').value, villa: document.getElementById('vi').value}});
-            sessionStorage.removeItem('market_cart'); window.open(`https://wa.me/593993252739?text=Nuevo pedido de ${n}`); location.href="index.html";
-        } catch (e) { document.getElementById('conf').disabled = false; }
+            // 1. Actualizar Stock en Firebase
+            for (const item of cart) {
+                const ref = doc(db, "productos", item.id);
+                const snap = await getDoc(ref);
+                if(snap.exists()) {
+                    await updateDoc(ref, { stock: snap.data().stock - item.qty });
+                }
+            }
+
+            // 2. Guardar Pedido en Firebase
+            const pedidoData = {
+                cliente: nom,
+                items: cart,
+                total: total,
+                pago: met,
+                billete: met === 'Efectivo' ? `$${billete}` : 'N/A',
+                fecha: Date.now(),
+                fechaTexto: new Date().toLocaleString(),
+                estado: "Preparando",
+                direccion: { ciudadela: ciu, manzana: mz, villa: vi }
+            };
+            await addDoc(collection(db, "pedidos"), pedidoData);
+
+            // 3. Formatear Mensaje de WhatsApp (NUEVA LÓGICA)
+            let listaItems = cart.map(i => `- ${i.name} (x${i.qty})`).join('\n');
+            
+            let msj = `*NUEVO PEDIDO*\n`;
+            msj += `Cliente: ${nom}\n`;
+            msj += `Dir: ${ciu} , Mz ${mz} , Vlla ${vi}\n\n`;
+            msj += `${listaItems}\n\n`;
+            msj += `*TOTAL: $${total.toFixed(2)}*\n`;
+            msj += `*PAGO:* ${met.toUpperCase()}\n`;
+            
+            if(met === 'Efectivo' && billete) {
+                msj += `*BILLETE:* $${billete}`;
+            }
+
+            // 4. Limpiar y Enviar
+            sessionStorage.removeItem('market_cart');
+            const phone = "593993252739"; 
+            const urlWhas = `https://wa.me/${phone}?text=${encodeURIComponent(msj)}`;
+            
+            await Swal.fire({
+                title: '¡Pedido Realizado!',
+                text: 'Te estamos redirigiendo a WhatsApp para finalizar.',
+                icon: 'success',
+                confirmButtonColor: '#ff4b4b'
+            });
+
+            window.location.href = urlWhas;
+
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'Hubo un problema al procesar tu pedido', 'error');
+            document.getElementById('conf').disabled = false;
+            document.getElementById('conf').innerText = "CONFIRMAR PEDIDO";
+        }
     };
 </script>
 </body>
