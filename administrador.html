@@ -2,178 +2,146 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Minimarket Propinec | Tienda</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>ERP Proprinec | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --py-red: #EF4143; --bg: #F7F7F7; --white: #ffffff; --dark: #292929; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--py-light); color: var(--py-dark); padding-bottom: 50px; }
-        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; }
-        .logo-img { height: 50px; width: auto; object-fit: contain; }
-        .cart-trigger { background: var(--py-red); color: white; padding: 8px 15px; border-radius: 20px; font-weight: 700; cursor: pointer; display: flex; gap: 8px; box-shadow: 0 4px 10px rgba(239, 65, 67, 0.3); }
-        .search-container { position: relative; }
-        #search-store { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f0f0f0; outline: none; }
-        .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-        .categories { display: flex; gap: 15px; padding: 15px 5%; overflow-x: auto; scrollbar-width: none; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 85px; }
-        .cat-circle { width: 65px; height: 65px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; }
-        .cat-item.active .cat-circle { background: var(--py-red); color: white; }
-        .cat-item span { font-size: 0.7rem; font-weight: 700; text-align: center; color: var(--dark); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px 5% 50px; }
-        .card { background: var(--white); border-radius: 18px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; transition: 0.3s; text-align: center; }
-        .card:hover { transform: translateY(-3px); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; }
-        .card h4 { font-size: 0.8rem; margin: 8px 0 2px; height: 35px; overflow: hidden; line-height: 1.2; }
-        .stock-tag { font-size: 0.65rem; color: #888; margin-bottom: 5px; }
-        .price { font-size: 1.1rem; font-weight: 800; color: var(--dark); }
-        .btn-plus { position: absolute; bottom: 10px; right: 10px; background: var(--py-red); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(239,65,67,0.3); }
-        #sidebar { position: fixed; right: -100%; top: 0; width: 400px; height: 100%; background: white; z-index: 2000; transition: 0.4s ease-in-out; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
-        #sidebar.active { right: 0; }
-        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1500; display:none; backdrop-filter: blur(2px); }
-        .overlay.active { display:block; }
-        .cart-list { flex: 1; overflow-y: auto; padding: 25px; }
-        .cart-item { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
-        .cart-item img { width: 50px; height: 50px; border-radius: 8px; }
-        .btn-checkout { background: var(--py-red); color: white; border: none; padding: 20px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-        @media (max-width: 480px) { #sidebar { width: 100%; } }
+        :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --sidebar: #1e293b; --bg: #f1f5f9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        aside { width: 260px; background: var(--sidebar); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .side-h { padding: 20px; background: white; border-bottom: 1px solid #334155; }
+        .side-menu { flex: 1; padding: 15px; }
+        .menu-btn { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; color: #94a3b8; margin-bottom: 5px; transition: 0.2s; }
+        .menu-btn:hover, .menu-btn.active { background: var(--primary); color: white; }
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        header { height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        .content { flex: 1; padding: 25px; overflow-y: auto; }
+        .table-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-h { padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; font-size: 0.7rem; color: #64748b; font-weight: 700; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
+        .p-img { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; }
+        .bg-success { background: #dcfce7; color: #166534; }
+        .bg-warning { background: #fef9c3; color: #854d0e; }
+        .bg-danger { background: #fee2e2; color: #991b1b; }
+        .is-hidden { opacity: 0.4; }
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
+        .modal-content { background:white; width:450px; padding:25px; border-radius:20px; position: relative; }
+        .form-group { margin-bottom: 12px; }
+        .form-group input, .form-group select { width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:10px; }
+        .btn-p { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="top-bar">
-            <img src="logo.jpeg" class="logo-img" alt="Logo Propinec">
-            <div class="cart-trigger" onclick="toggleCart()">
-                <i class="fas fa-shopping-bag"></i> <span id="cart-counter">0</span>
+    <aside>
+        <div class="side-h"><img src="logo.jpeg" style="width:100%"></div>
+        <div class="side-menu">
+            <div class="menu-btn active" onclick="switchT('dash', this)"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="menu-btn" onclick="switchT('inv', this)"><i class="fas fa-boxes"></i> Inventario</div>
+            <div class="menu-btn" onclick="switchT('cat', this)"><i class="fas fa-tags"></i> Categorías</div>
+            <div class="menu-btn" onclick="location.href='pedidos.html'"><i class="fas fa-print"></i> Monitor Pedidos</div>
+        </div>
+    </aside>
+    <main>
+        <header><div style="font-weight:700">ERP ADMINISTRATIVO</div><div>Cloud Online <span style="color:var(--success)">●</span></div></header>
+        <div class="content">
+            <div id="tab-dash">
+                <h2>Caja Automática de Hoy</h2>
+                <p id="st-ventas" style="font-size:3rem; font-weight:800; color:var(--success)">$0.00</p><br>
+                <div class="table-card"><div class="table-h"><h3>Últimas Ventas</h3></div><table id="ventas-tab"><thead><tr><th>Hora</th><th>Cliente</th><th>Total</th></tr></thead><tbody id="p-recent"></tbody></table></div>
+            </div>
+            <div id="tab-inv" class="hidden">
+                <div class="table-card"><div class="table-h"><h3>Productos</h3><button class="btn-p" onclick="openM('modalInv')">NUEVO</button></div><table><thead><tr><th>Foto</th><th>Producto</th><th>Cat</th><th>Stock</th><th>Acción</th></tr></thead><tbody id="inv-body"></tbody></table></div>
+            </div>
+            <div id="tab-cat" class="hidden">
+                <div class="table-card"><div class="table-h"><h3>Categorías</h3><button class="btn-p" onclick="openM('modalCat')">AÑADIR</button></div><table><thead><tr><th>Icono</th><th>Nombre</th><th>Acción</th></tr></thead><tbody id="cat-body"></tbody></table></div>
             </div>
         </div>
-        <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-store" placeholder="¿Qué necesitas hoy?">
-        </div>
-    </header>
-
-    <div class="categories" id="cat-list"></div>
-    <div class="grid" id="product-grid"></div>
-    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
-
-    <div id="sidebar">
-        <div style="padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-weight: 800;">Mi Carrito</h2>
-            <i class="fas fa-times" onclick="toggleCart()" style="font-size: 1.5rem; cursor: pointer;"></i>
-        </div>
-        <div class="cart-list" id="cart-items"></div>
-        <div style="padding: 25px; border-top: 2px solid #f1f5f9;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:1.3rem;">
-                <span>Total:</span><span id="total-price">$0.00</span>
-            </div>
-            <button class="btn-checkout" onclick="location.href='pago.html'">CONTINUAR PEDIDO</button>
-        </div>
-    </div>
-
+    </main>
+    <!-- Modales -->
+    <div class="modal" id="modalInv"><div class="modal-content">
+        <h3>Nuevo Producto</h3><br>
+        <div class="form-group"><input type="text" id="n-name" placeholder="Nombre"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px"><input type="number" id="n-price" step="0.01" placeholder="Precio"><input type="number" id="n-stock" placeholder="Stock"></div>
+        <div class="form-group" style="margin-top:10px"><select id="n-cat-select"></select></div>
+        <div class="form-group"><input type="file" id="n-img" accept="image/*"></div>
+        <button class="btn-p" style="width:100%" onclick="guardarP()">GUARDAR EN NUBE</button><br><br>
+        <button onclick="closeM('modalInv')" style="width:100%; border:none; background:none; cursor:pointer">Cerrar</button>
+    </div></div>
+    <div class="modal" id="modalCat"><div class="modal-content">
+        <h3>Nueva Categoría</h3><br>
+        <div class="form-group"><input type="text" id="cat-name" placeholder="Nombre"></div>
+        <div class="form-group"><input type="text" id="cat-emoji" placeholder="Emoji"></div>
+        <button class="btn-p" style="width:100%" onclick="guardarC()">AÑADIR CATEGORÍA</button><br><br>
+        <button onclick="closeM('modalCat')" style="width:100%; border:none; background:none; cursor:pointer">Cerrar</button>
+    </div></div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
-        authDomain: "mi-mini-market.firebaseapp.com",
-        projectId: "mi-mini-market",
-        storageBucket: "mi-mini-market.firebasestorage.app",
-        messagingSenderId: "19960510315",
-        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+      authDomain: "mi-mini-market.firebaseapp.com",
+      projectId: "mi-mini-market",
+      storageBucket: "mi-mini-market.firebasestorage.app",
+      messagingSenderId: "19960510315",
+      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    let allProds = [], cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
 
-    // Cargar Categorías Dinámicas
+    if(prompt("🔐 Acceso Admin:") !== "2024") location.href="index.html";
+
+    window.switchT = (id, el) => {
+        document.querySelectorAll('.menu-btn').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.content > div').forEach(d => d.classList.add('hidden'));
+        document.getElementById(`tab-${id}`).classList.remove('hidden');
+    }
+
     onSnapshot(query(collection(db, "categorias"), orderBy("nombre", "asc")), (snap) => {
-        let html = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-circle"><i class="fas fa-border-all"></i></div><span>Todos</span></div>`;
-        snap.forEach(doc => {
-            const c = doc.data();
-            html += `<div class="cat-item" onclick="window.filterCat('${c.nombre}', this)"><div class="cat-circle">${c.icono}</div><span>${c.nombre}</span></div>`;
-        });
-        document.getElementById('cat-list').innerHTML = html;
+        const body = document.getElementById('cat-body'), select = document.getElementById('n-cat-select');
+        let ht = "", hs = "";
+        snap.forEach(d => { ht += `<tr><td>${d.data().icono}</td><td><b>${d.data().nombre}</b></td><td><button onclick="delC('${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`; hs += `<option>${d.data().nombre}</option>`; });
+        body.innerHTML = ht; select.innerHTML = hs;
     });
 
-    // Cargar Productos
     onSnapshot(collection(db, "productos"), (snap) => {
-        allProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        renderStore(allProds);
+        document.getElementById('inv-body').innerHTML = snap.docs.map(d => {
+            const p = d.data(); let b = p.stock < 10 ? 'bg-danger' : (p.stock < 20 ? 'bg-warning' : 'bg-success');
+            return `<tr class="${p.visible===false?'is-hidden':''}"><td><img src="${p.img}" class="p-img"></td><td><b>${p.name}</b></td><td>${p.category}</td><td><span class="badge ${b}">${p.stock} UNID.</span></td>
+            <td><button onclick="togV('${d.id}',${p.visible})"><i class="fas ${p.visible?'fa-eye':'fa-eye-slash'}"></i></button> <button onclick="delP('${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+        }).join('');
     });
 
-    function renderStore(list) {
-        const grid = document.getElementById('product-grid');
-        grid.innerHTML = '';
-        list.filter(p => p.visible !== false && p.stock > 0).forEach(p => {
-            grid.innerHTML += `
-                <div class="card">
-                    <img src="${p.img}">
-                    <h4>${p.name}</h4>
-                    <p class="stock-tag">Hábiles: <b>${p.stock}</b></p>
-                    <p class="price">$${p.price}</p>
-                    <button class="btn-plus" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}',${p.stock})"><i class="fas fa-plus"></i></button>
-                </div>`;
-        });
-    }
+    onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc"), limit(10)), (snap) => {
+        let t = 0; const h = new Date().toLocaleDateString();
+        document.getElementById('p-recent').innerHTML = snap.docs.map(d => {
+            const p = d.data(); if(p.fechaTexto.includes(h)) t += p.total;
+            return `<tr><td>${p.fechaTexto.split(',')[1]}</td><td>${p.cliente}</td><td>$${p.total.toFixed(2)}</td></tr>`;
+        }).join('');
+        document.getElementById('st-ventas').innerText = `$${t.toFixed(2)}`;
+    });
 
-    window.filterCat = (cat, btn) => {
-        document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        renderStore(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat));
+    window.guardarP = async () => {
+        const n = document.getElementById('n-name').value, p = document.getElementById('n-price').value, s = document.getElementById('n-stock').value, f = document.getElementById('n-img').files[0];
+        const r = new FileReader(); r.readAsDataURL(f);
+        r.onload = async () => {
+            await addDoc(collection(db, "productos"), { name: n, price: parseFloat(p), stock: parseInt(s), category: document.getElementById('n-cat-select').value, img: r.result, visible: true });
+            closeM('modalInv');
+        };
     };
-
-    window.addToCart = (id, name, price, img, max) => {
-        const ex = cart.find(i => i.id === id);
-        if(ex && ex.qty >= max) { Swal.fire('Stock limitado','No hay más unidades disponibles','warning'); return; }
-        ex ? ex.qty++ : cart.push({id, name, price, img, qty:1});
-        save();
-    };
-
-    function save() {
-        sessionStorage.setItem('market_cart', JSON.stringify(cart));
-        renderCartUI();
-        document.getElementById('sidebar').classList.add('active');
-        document.getElementById('overlay').classList.add('active');
-    }
-
-    function renderCartUI() {
-        let t = 0, c = 0;
-        const container = document.getElementById('cart-items');
-        container.innerHTML = '';
-        cart.forEach((i, idx) => {
-            t += i.price * i.qty; c += i.qty;
-            container.innerHTML += `<div class="cart-item"><img src="${i.img}"><div><b>${i.name}</b><br><small>$${i.price} x ${i.qty}</small></div><div style="margin-left:auto"><button onclick="updateQty(${idx},-1)" style="padding:0 8px">-</button> <button onclick="updateQty(${idx},1)" style="padding:0 8px">+</button></div></div>`;
-        });
-        document.getElementById('cart-counter').innerText = c;
-        document.getElementById('total-price').innerText = `$${t.toFixed(2)}`;
-    }
-
-    window.updateQty = (idx, delta) => {
-        const item = cart[idx];
-        const stockActual = allProds.find(p => p.id === item.id).stock;
-        if(delta > 0 && item.qty >= stockActual) return;
-        item.qty += delta;
-        if(item.qty <= 0) cart.splice(idx, 1);
-        save();
-    };
-
-    document.getElementById('search-store').oninput = (e) => {
-        const term = e.target.value.toLowerCase();
-        renderStore(allProds.filter(p => p.name.toLowerCase().includes(term)));
-    };
-
-    window.toggleCart = () => {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
-    };
-    renderCartUI();
+    window.guardarC = async () => { await addDoc(collection(db, "categorias"), { nombre: document.getElementById('cat-name').value, icono: document.getElementById('cat-emoji').value }); closeM('modalCat'); };
+    window.togV = async (id, s) => await updateDoc(doc(db, "productos", id), { visible: !s });
+    window.delP = async (id) => confirm("¿Eliminar?") && await deleteDoc(doc(db, "productos", id));
+    window.delC = async (id) => confirm("¿Borrar Cat?") && await deleteDoc(doc(db, "categorias", id));
+    window.openM = (id) => document.getElementById(id).style.display = 'flex';
+    window.closeM = (id) => document.getElementById(id).style.display = 'none';
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
