@@ -178,3 +178,220 @@
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CENTRO DE IMPRESIÓN PRO | Mi Mini Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    
+    <!-- LIBRERÍAS PARA PDF E ICONOS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- ESTILOS PARA PANTALLA --- */
+        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .monitor-box { background: white; color: #1e293b; padding: 30px; border-radius: 25px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 400px; width: 95%; margin-bottom: 30px; }
+        .status-badge { background: #dcfce7; color: #166534; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 8px; }
+        .pulse { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse-anim 1.5s infinite; }
+        @keyframes pulse-anim { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+        
+        .history-container { background: #1e293b; width: 95%; max-width: 800px; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #334155; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #cbd5e1; }
+        .history-table th { text-align: left; padding: 12px; border-bottom: 2px solid #334155; }
+        .history-table td { padding: 12px; border-bottom: 1px solid #334155; }
+        
+        /* Botones de acción corregidos */
+        .btn-act { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 40px; }
+        .btn-print { background: #475569; }
+        .btn-pdf { background: #ef4444; }
+
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (SIN HOJA EN BLANCO) --- */
+        #factura-imprimir { 
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 280px; 
+            background: white;
+            color: black;
+            padding: 10px;
+        }
+
+        @media print {
+            body { background: white !important; }
+            .monitor-box, .history-container, audio { display: none !important; }
+            
+            #factura-imprimir { 
+                display: block !important; 
+                left: 0 !important; 
+                width: 100%; 
+                margin: 0 !important;
+                padding: 0 !important;
+                position: static !important;
+                font-family: 'Courier Prime', monospace !important;
+            }
+            /* Esto quita la segunda hoja vacía */
+            @page { 
+                margin: 0;
+                size: auto;
+            }
+            html, body {
+                height: 99%;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="monitor-box">
+        <div style="font-size: 3rem;">📠</div>
+        <h1 style="margin: 5px 0; font-weight: 800;">AUTO-PRINT PRO</h1>
+        <div class="status-badge"><div class="pulse"></div> SISTEMA CONECTADO</div>
+        <p style="font-size: 0.7rem; color: #64748b; margin-top: 10px;">Haz clic aquí para activar alertas sonoras.</p>
+    </div>
+
+    <div class="history-container">
+        <h2 style="font-size: 1.1rem; margin-bottom: 15px; color: #94a3b8;"><i class="fas fa-history"></i> Historial de Pedidos</h2>
+        <div style="overflow-x: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr><th>Hora</th><th>Cliente</th><th>Total</th><th>Acciones</th></tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- Aquí se cargan los datos -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE DISEÑO -->
+    <div id="factura-imprimir"></div>
+
+    <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+        authDomain: "mi-mini-market.firebaseapp.com",
+        projectId: "mi-mini-market",
+        storageBucket: "mi-mini-market.firebasestorage.app",
+        messagingSenderId: "19960510315",
+        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let yaCargo = false;
+    let pedidosMemoria = [];
+
+    // Cargar historial en tiempo real
+    onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "asc")), (snap) => {
+        const body = document.getElementById('history-body');
+        const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        pedidosMemoria = docs;
+
+        body.innerHTML = [...docs].reverse().slice(0, 15).map(p => `
+            <tr>
+                <td>${p.fechaTexto.split(',')[1] || p.fechaTexto}</td>
+                <td><b>${p.cliente}</b></td>
+                <td style="color:#22c55e; font-weight:bold">$${p.total.toFixed(2)}</td>
+                <td>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-act btn-print" onclick="window.reimprimir('${p.id}')" title="Reimprimir"><i class="fas fa-print"></i></button>
+                        <button class="btn-act btn-pdf" onclick="window.descargarPDF('${p.id}')" title="Bajar PDF"><i class="fas fa-file-pdf"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        if (!yaCargo) { yaCargo = true; return; }
+        
+        snap.docChanges().forEach(change => {
+            if (change.type === "added") procesarImpresion(change.doc.data());
+        });
+    });
+
+    // DISEÑO ÚNICO (Sin espacios extras al final para evitar hoja blanca)
+    function crearHtmlTicket(p) {
+        let itemsHtml = "";
+        p.items.forEach(i => {
+            itemsHtml += `<div>${i.name.toUpperCase().substring(0,18).padEnd(18)} x${i.qty} $${(i.price*i.qty).toFixed(2)}</div>`;
+        });
+
+        return `
+            <div id="target-pdf" style="width: 260px; padding: 5px; background: white; color: black; font-family: 'Courier Prime', monospace; line-height: 1.1;">
+                <center>
+                    <strong style="font-size: 1.1rem;">MI MINI MARKET</strong><br>
+                    BABAHOYO, ECUADOR<br>
+                    ---------------------------<br>
+                    <strong>TICKET DE PEDIDO</strong><br>
+                </center>
+                <br>
+                <b>FECHA:</b> ${p.fechaTexto}<br>
+                <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
+                <b>CDLA:</b> ${p.direccion.ciudadela.toUpperCase()}<br>
+                <b>MZ:</b> ${p.direccion.manzana} &nbsp; <b>VILLA:</b> ${p.direccion.villa}<br>
+                <b>PAGO:</b> ${p.pago.toUpperCase()}<br>
+                ${p.pagaCon ? '<b>PAGA CON:</b> $' + p.pagaCon : ''}<br>
+                ---------------------------<br>
+                <b>DETALLE:</b><br>
+                ${itemsHtml}
+                ---------------------------<br>
+                <strong style="font-size: 1rem;">TOTAL: $${p.total.toFixed(2)}</strong><br>
+                <br>
+                <center>*** COPIA DE CONTROL ***</center>
+            </div>`;
+    }
+
+    function procesarImpresion(p) {
+        document.getElementById('beep').play().catch(() => {});
+        document.getElementById('factura-imprimir').innerHTML = crearHtmlTicket(p);
+        setTimeout(() => { window.print(); }, 700);
+    }
+
+    window.reimprimir = (id) => {
+        const p = pedidosMemoria.find(i => i.id === id);
+        if(p) procesarImpresion(p);
+    };
+
+    window.descargarPDF = async (id) => {
+        const p = pedidosMemoria.find(i => i.id === id);
+        if(!p) return;
+
+        const area = document.getElementById('factura-imprimir');
+        area.innerHTML = crearHtmlTicket(p);
+        area.style.left = "0px"; 
+
+        try {
+            const canvas = await html2canvas(document.querySelector("#target-pdf"), {
+                scale: 2,
+                backgroundColor: "#ffffff"
+            });
+            
+            area.style.left = "-9999px"; 
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: [80, (canvas.height * 80) / canvas.width]
+            });
+
+            pdf.addImage(imgData, 'PNG', 0, 0, 80, (canvas.height * 80) / canvas.width);
+            pdf.save(`Pedido_${p.cliente.replace(/ /g, '_')}.pdf`);
+        } catch (e) {
+            alert("Error al generar PDF");
+            area.style.left = "-9999px";
+        }
+    };
+
+    document.addEventListener('click', () => { console.log("Audio activado"); });
+</script>
+</body>
+</html>
