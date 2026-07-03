@@ -3,28 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Mini Market | Tienda</title>
+    <title>Mega Minimarket Propinec | Tienda Oficial</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --py-red: #EF4143; --py-light: #F7F7F7; --py-dark: #292929; --white: #ffffff; }
+        :root { --py-red: #EF4143; --bg: #F7F7F7; --white: #ffffff; --dark: #292929; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--py-light); color: var(--py-dark); }
-        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; }
-        .cart-trigger { background: var(--py-red); color: white; padding: 8px 15px; border-radius: 20px; font-weight: 700; cursor: pointer; display: flex; gap: 8px; }
-        #search-store { width: 100%; padding: 12px 45px; border-radius: 12px; border: 1px solid #e2e2e2; background: #f0f0f0; outline: none; }
-        .categories { display: flex; gap: 15px; padding: 15px 5%; overflow-x: auto; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 80px; }
-        .cat-circle { width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--py-red); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        body { background-color: var(--bg); color: var(--dark); padding-bottom: 50px; }
+
+        header { background: var(--white); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo-img { height: 45px; width: auto; object-fit: contain; }
+        
+        .cart-trigger { background: var(--py-red); color: white; padding: 8px 15px; border-radius: 20px; font-weight: 700; cursor: pointer; display: flex; gap: 8px; box-shadow: 0 4px 10px rgba(239, 65, 67, 0.3); }
+        .search-container { position: relative; }
+        #search-store { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid #e2e2e2; background: #f0f0f0; outline: none; }
+        .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+
+        .categories { display: flex; gap: 15px; padding: 15px 5%; overflow-x: auto; scrollbar-width: none; }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 85px; }
+        .cat-circle { width: 60px; height: 60px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; }
         .cat-item.active .cat-circle { background: var(--py-red); color: white; }
+        .cat-item span { font-size: 0.7rem; font-weight: 700; text-align: center; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 20px 5%; }
-        .card { background: var(--white); border-radius: 16px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; text-align: center; }
-        .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; }
-        .btn-plus { position: absolute; bottom: 10px; right: 10px; background: var(--py-red); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; }
-        #sidebar { position: fixed; right: -100%; top: 0; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+        .card { background: var(--white); border-radius: 16px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; transition: 0.3s; text-align: center; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; }
+        .card h4 { font-size: 0.8rem; margin: 8px 0 4px; height: 35px; overflow: hidden; }
+        .price { font-size: 1.1rem; font-weight: 800; }
+        .btn-plus { position: absolute; bottom: 10px; right: 10px; background: var(--py-red); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(239,65,67,0.3); }
+
+        #sidebar { position: fixed; right: -100%; top: 0; width: 400px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
         #sidebar.active { right: 0; }
-        .cart-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1500; display:none; }
+        .overlay.active { display:block; }
+        .cart-list { flex: 1; overflow-y: auto; margin: 20px 0; }
+        .btn-checkout { background: var(--py-red); color: white; border: none; padding: 18px; border-radius: 12px; width: 100%; font-weight: 800; cursor: pointer; }
         @media (max-width: 480px) { #sidebar { width: 100%; } }
     </style>
 </head>
@@ -32,99 +47,103 @@
 
     <header>
         <div class="top-bar">
-            <div style="font-weight: 800; color: var(--py-red);">MI MINI MARKET</div>
+            <img src="logo.png" class="logo-img" alt="Mega Propinec">
             <div class="cart-trigger" onclick="toggleCart()">
                 <i class="fas fa-shopping-bag"></i> <span id="cart-counter">0</span>
             </div>
         </div>
-        <div style="position:relative;">
-            <i class="fas fa-search" style="position:absolute; left:15px; top:15px; color:#888;"></i>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
             <input type="text" id="search-store" placeholder="¿Qué necesitas hoy?">
         </div>
     </header>
 
-    <div class="categories">
-        <div class="cat-item active" onclick="filterCat('Todos', this)"><div class="cat-circle">🏠</div><span>Todos</span></div>
-        <div class="cat-item" onclick="filterCat('Abarrotes', this)"><div class="cat-circle">🍞</div><span>Abarrotes</span></div>
-        <div class="cat-item" onclick="filterCat('Bebidas', this)"><div class="cat-circle">🥤</div><span>Bebidas</span></div>
-        <div class="cat-item" onclick="filterCat('Carnes', this)"><div class="cat-circle">🍖</div><span>Carnes</span></div>
-        <div class="cat-item" onclick="filterCat('Limpieza', this)"><div class="cat-circle">🧼</div><span>Limpieza</span></div>
-    </div>
+    <div class="categories" id="cat-list"></div>
 
     <div class="grid" id="product-grid"></div>
 
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
     <div id="sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-weight:800;">Mi Pedido</h2>
-            <i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer; font-size:1.5rem;"></i>
+            <h2 style="font-weight:800;">Mi Carrito</h2>
+            <i class="fas fa-times" onclick="toggleCart()" style="font-size:1.5rem; cursor:pointer;"></i>
         </div>
-        <div id="cart-items" style="flex:1; overflow-y:auto; margin:20px 0;"></div>
+        <div class="cart-list" id="cart-items"></div>
         <div style="border-top:2px solid #eee; padding-top:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.2rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:800; font-size:1.2rem;">
                 <span>Total:</span><span id="total-price">$0.00</span>
             </div>
-            <button onclick="location.href='pago.html'" style="background:var(--py-red); color:white; width:100%; padding:15px; border-radius:12px; border:none; font-weight:800; cursor:pointer;">CONTINUAR</button>
+            <button class="btn-checkout" onclick="location.href='pago.html'">CONTINUAR</button>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
-        authDomain: "mi-mini-market.firebaseapp.com",
-        projectId: "mi-mini-market",
-        storageBucket: "mi-mini-market.firebasestorage.app",
-        messagingSenderId: "19960510315",
-        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
+      apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c",
+      authDomain: "mi-mini-market.firebaseapp.com",
+      projectId: "mi-mini-market",
+      storageBucket: "mi-mini-market.firebasestorage.app",
+      messagingSenderId: "19960510315",
+      appId: "1:19960510315:web:fe0743420e7ba893b2fe2e"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    let allProds = [];
-    let cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
+    let allProds = [], cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
 
-    onSnapshot(collection(db, "productos"), (snap) => {
-        allProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        render(allProds);
+    // Cargar Categorías Dinámicas
+    onSnapshot(query(collection(db, "categorias"), orderBy("nombre", "asc")), (snap) => {
+        let html = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-circle"><i class="fas fa-border-all"></i></div><span>Todos</span></div>`;
+        snap.forEach(doc => {
+            const c = doc.data();
+            html += `<div class="cat-item" onclick="window.filterCat('${c.nombre}', this)"><div class="cat-circle">${c.icono}</div><span>${c.nombre}</span></div>`;
+        });
+        document.getElementById('cat-list').innerHTML = html;
     });
 
-    function render(list) {
+    // Cargar Productos
+    onSnapshot(collection(db, "productos"), (snap) => {
+        allProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        renderStore(allProds);
+    });
+
+    function renderStore(list) {
         const grid = document.getElementById('product-grid');
         grid.innerHTML = '';
         list.filter(p => p.visible && p.stock > 0).forEach(p => {
-            grid.innerHTML += `
-                <div class="card">
-                    <img src="${p.img}">
-                    <h4 style="font-size:0.8rem; margin:5px 0;">${p.name}</h4>
-                    <p style="font-size:0.7rem; color:gray">Disponibles: ${p.stock}</p>
-                    <p style="font-weight:800; color:var(--py-red)">$${p.price}</p>
-                    <button class="btn-plus" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}',${p.stock})">+</button>
-                </div>`;
+            grid.innerHTML += `<div class="card"><img src="${p.img}"><h4>${p.name}</h4><p style="font-size:0.7rem; color:gray">Disponibles: ${p.stock}</p><p class="price">$${p.price}</p><button class="btn-plus" onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.img}', ${p.stock})"><i class="fas fa-plus"></i></button></div>`;
         });
     }
 
+    window.filterCat = (cat, btn) => {
+        document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        renderStore(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat));
+    };
+
     window.addToCart = (id, name, price, img, max) => {
         const ex = cart.find(i => i.id === id);
-        if(ex && ex.qty >= max) return alert("Stock máximo alcanzado");
+        if(ex && ex.qty >= max) return;
         ex ? ex.qty++ : cart.push({id, name, price, img, qty:1});
         save();
     };
 
-    function save() { 
-        sessionStorage.setItem('market_cart', JSON.stringify(cart)); 
-        renderCart(); 
-        document.getElementById('sidebar').classList.add('active'); 
+    function save() {
+        sessionStorage.setItem('market_cart', JSON.stringify(cart));
+        renderCart();
+        document.getElementById('sidebar').classList.add('active');
+        document.getElementById('overlay').classList.add('active');
     }
 
     function renderCart() {
-        let t = 0, c = 0;
-        const container = document.getElementById('cart-items');
-        container.innerHTML = '';
+        let t = 0, c = 0; document.getElementById('cart-items').innerHTML = '';
         cart.forEach((i, idx) => {
             t += i.price * i.qty; c += i.qty;
-            container.innerHTML += `<div class="cart-item"><span>${i.name} x${i.qty}</span><b>$${(i.price*i.qty).toFixed(2)}</b></div>`;
+            document.getElementById('cart-items').innerHTML += `<div style="display:flex; gap:10px; margin-bottom:15px;"><img src="${i.img}" width="50" style="border-radius:8px"><div><b>${i.name}</b><br><small>$${i.price} x ${i.qty}</small></div></div>`;
         });
         document.getElementById('cart-counter').innerText = c;
         document.getElementById('total-price').innerText = `$${t.toFixed(2)}`;
@@ -132,15 +151,13 @@
 
     document.getElementById('search-store').oninput = (e) => {
         const term = e.target.value.toLowerCase();
-        render(allProds.filter(p => p.name.toLowerCase().includes(term)));
+        renderStore(allProds.filter(p => p.name.toLowerCase().includes(term)));
     };
 
-    window.toggleCart = () => document.getElementById('sidebar').classList.toggle('active');
-    window.filterCat = (cat, btn) => {
-        document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        render(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat));
-    };
+    window.toggleCart = () => {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+    }
     renderCart();
 </script>
 </body>
