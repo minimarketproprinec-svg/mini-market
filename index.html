@@ -3,326 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda | Mini Market Propinec</title>
-    
-    <!-- Fuentes e Iconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Tienda | MINI MARKET PROPRINEC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Librerías de Alertas (SweetAlert2) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
-        :root { --main: #ff4b4b; --bg: #f8f9fa; --dark: #1a1a1a; --success: #10b981; }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
-        body { background: var(--bg); padding-bottom: 80px; color: var(--dark); }
-        
-        /* --- HEADER ORIGINAL (CONSERVADO) --- */
-        header { background: white; padding: 15px 5%; position: sticky; top:0; z-index:1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo-img { height: 45px; cursor: pointer; }
-        .cart-trigger { background: var(--main); color: white; padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 700; display: flex; gap: 10px; position: relative; border: none; }
-        
-        .search-box { position: relative; width: 100%; }
-        #search { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid #eee; background: #f1f3f5; outline: none; transition: 0.3s; }
-        #search:focus { background: white; border-color: var(--main); }
-        .search-box i { position: absolute; left: 18px; top: 14px; color: #888; }
-
-        /* --- NAV RESPONSIVE (CARRUSEL EN MÓVIL) --- */
-        .nav-bar { background: white; border-top: 1px solid #eee; padding: 10px 5%; overflow-x: auto; scrollbar-width: none; }
-        .nav-bar::-webkit-scrollbar { display: none; }
-        .nav-links { display: flex; gap: 15px; align-items: center; white-space: nowrap; }
-        .nav-links span { text-decoration: none; color: #444; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; padding: 8px 18px; border-radius: 50px; }
-        .nav-links span:hover { color: var(--main); }
-        .hot-label { background: var(--main); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; margin-left: 3px; font-weight: 800; }
-
-        @media (max-width: 768px) {
-            .nav-links span { background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; }
-        }
-
-        /* --- CATEGORÍAS ORIGINALES (ICONOS CIRCULARES) --- */
-        .cats { display: flex; gap: 15px; padding: 20px 5%; overflow-x: auto; scrollbar-width: none; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; cursor: pointer; transition: 0.3s; }
-        .cat-c { width: 60px; height: 60px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
-        .cat-item.active .cat-c { background: var(--main); color: white; transform: scale(1.1); }
-        .cat-item span { font-size: 0.75rem; font-weight: 700; margin-top: 8px; color: #666; }
-
-        /* --- GRID Y TARJETAS ORIGINALES --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 5% 50px; }
-        .card { background: white; border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; position: relative; border: 1px solid #f1f1f1; display: flex; flex-direction: column; min-height: 250px; }
-        .card:hover { transform: translateY(-5px); border-color: var(--main); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; margin-bottom: 8px; }
-        .card h4 { font-size: 0.8rem; font-weight: 700; height: 35px; overflow: hidden; color: #333; }
-        
-        .price-tag { font-size: 1.1rem; font-weight: 800; color: var(--main); margin-top: auto; }
-        .old-price { font-size: 0.75rem; color: #999; text-decoration: line-through; display: block; }
-        
-        .btn-add { background: var(--main); color: white; width: 35px; height: 35px; border-radius: 12px; border: none; cursor: pointer; align-self: flex-end; margin-top: 5px; font-size: 1.2rem; transition: 0.2s; }
-        .btn-add:hover { background: var(--dark); transform: rotate(90deg); }
-
-        /* BADGES */
-        .badge-status { position: absolute; top: 10px; left: 10px; font-size: 0.6rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; color: white; z-index: 10; }
-        .bg-new { background: #3b82f6; }
-        .bg-promo { background: var(--main); }
-        .bg-best { background: #f59e0b; }
-
-        /* --- SIDEBAR CARRITO --- */
-        #sidebar { position: fixed; right: -100%; top: 0; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
-        #sidebar.active { right: 0; }
-        @media (max-width: 480px) { #sidebar { width: 100%; } }
-        
-        .cart-list { flex: 1; overflow-y: auto; margin: 20px 0; }
-        .qty-ctrl { display: flex; align-items: center; gap: 12px; background: #f1f5f9; padding: 5px; border-radius: 10px; width: fit-content; margin-top: 5px; }
-        .qty-btn { width: 28px; height: 28px; border-radius: 8px; border: none; background: white; cursor: pointer; font-weight: 800; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; }
-        .qty-btn:hover { background: var(--main); color: white; }
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1500; display: none; backdrop-filter: blur(2px); }
-        .overlay.active { display: block; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .product-card { transition: all 0.2s; }
+        .product-card:active { transform: scale(0.95); }
     </style>
 </head>
-<body>
+<body class="pb-32">
 
-    <div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-    <header>
-        <div class="top">
-            <img src="logo.jpg" class="logo-img" onclick="filterType('inicio')" alt="Propinec">
-            <div class="cart-trigger" onclick="toggleCart()">
-                <i class="fas fa-shopping-basket"></i>
-                <span id="count">0</span>
+    <header class="bg-blue-900 text-white p-5 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="font-black italic text-2xl tracking-tighter">PROPRINEC</h1>
+            <div class="bg-blue-800 px-4 py-2 rounded-full flex items-center gap-2 border border-blue-700">
+                <i class="fas fa-shopping-cart text-yellow-400"></i>
+                <span id="cart-count" class="font-bold text-lg">0</span>
             </div>
-        </div>
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search" placeholder="¿Qué buscas hoy para tu hogar?">
         </div>
     </header>
 
-    <!-- BARRA DE NAVEGACIÓN -->
-    <nav class="nav-bar">
-        <div class="nav-links">
-            <span onclick="filterType('inicio')">Inicio</span>
-            <span onclick="filterType('ofertas')">Ofertas <span class="hot-label">HOT</span></span>
-            <span onclick="filterType('nuevos')">Nuevos</span>
-            <span onclick="filterType('ventas')">Más Vendidos</span>
-            <span onclick="openAbout()">Quiénes Somos</span>
-        </div>
-    </nav>
-
-    <!-- ICONOS DE CATEGORÍA CIRCULARES -->
-    <div class="cats" id="cat-list"></div>
-
-    <!-- CONTENEDOR DE PRODUCTOS -->
-    <div class="grid" id="product-grid"></div>
-
-    <!-- SIDEBAR CARRITO -->
-    <div id="sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center">
-            <h3 style="font-weight:800">Mi Carrito</h3>
-            <i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer"></i>
-        </div>
-        <div class="cart-list" id="cart-items"></div>
-        <div style="padding-top:20px; border-top:1px solid #eee">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.3rem">
-                <span>Total:</span>
-                <span id="total-p" style="color:var(--main)">$0.00</span>
+    <main class="container mx-auto p-4 max-w-5xl">
+        <!-- Ejemplo de Categoría -->
+        <h2 class="font-bold text-gray-400 text-xs uppercase tracking-widest mb-4 mt-6">Productos Destacados</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Producto 1 -->
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 product-card flex flex-col items-center">
+                <div class="w-full h-32 bg-slate-50 rounded-2xl mb-3 flex items-center justify-center text-4xl">🍞</div>
+                <h3 class="font-bold text-gray-800 text-sm text-center">Pan de Casa</h3>
+                <p class="text-blue-600 font-black text-lg">$0.15</p>
+                <button onclick="agregarAlCarrito('Pan de Casa', 0.15)" class="w-full mt-3 bg-blue-600 text-white py-2 rounded-xl text-xs font-bold uppercase shadow-md active:bg-blue-800">Agregar</button>
             </div>
-            <button style="background:var(--main); color:white; border:none; padding:18px; border-radius:15px; width:100%; font-weight:800; cursor:pointer" onclick="location.href='pago.html'">FINALIZAR PEDIDO</button>
+
+            <!-- Producto 2 -->
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 product-card flex flex-col items-center">
+                <div class="w-full h-32 bg-slate-50 rounded-2xl mb-3 flex items-center justify-center text-4xl">🥛</div>
+                <h3 class="font-bold text-gray-800 text-sm text-center">Leche Entera</h3>
+                <p class="text-blue-600 font-black text-lg">$1.10</p>
+                <button onclick="agregarAlCarrito('Leche Entera', 1.10)" class="w-full mt-3 bg-blue-600 text-white py-2 rounded-xl text-xs font-bold uppercase shadow-md active:bg-blue-800">Agregar</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Barra de Pago Flotante -->
+    <div id="cart-bar" class="fixed bottom-0 w-full bg-white border-t border-gray-100 p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] transition-all translate-y-full">
+        <div class="container mx-auto flex justify-between items-center max-w-5xl">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Total a pagar</p>
+                <p id="cart-total" class="text-2xl font-black text-blue-900">$0.00</p>
+            </div>
+            <button onclick="irAPagar()" class="bg-green-600 text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-3 hover:bg-green-700 transition shadow-lg">
+                FINALIZAR PEDIDO <i class="fas fa-chevron-right text-xs"></i>
+            </button>
         </div>
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    <script>
+        let carrito = [];
 
-    const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
-    const app = initializeApp(firebaseConfig); const db = getFirestore(app);
-    
-    let allProds = [], allOrders = [], cart = JSON.parse(sessionStorage.getItem('market_cart')) || [];
-
-    // --- CARGA DE DATOS ---
-
-    // 1. Categorías (Solo iconos circulares)
-    onSnapshot(query(collection(db, "categorias"), orderBy("nombre", "asc")), (snap) => {
-        let iconsHTML = `<div class="cat-item active" onclick="window.filterCat('Todos', this)"><div class="cat-c">🏠</div><span>Todos</span></div>`;
-        snap.forEach(doc => {
-            const cat = doc.data();
-            iconsHTML += `<div class="cat-item" onclick="window.filterCat('${cat.nombre}', this)"><div class="cat-c">${cat.icono}</div><span>${cat.nombre}</span></div>`;
-        });
-        document.getElementById('cat-list').innerHTML = iconsHTML;
-    });
-
-    // 2. Productos
-    onSnapshot(collection(db, "productos"), (snap) => {
-        allProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        renderS(allProds);
-    });
-
-    // 3. Pedidos (para Más Vendidos)
-    onSnapshot(collection(db, "pedidos"), (snap) => {
-        allOrders = snap.docs.map(d => d.data());
-    });
-
-    // --- RENDERIZADO ---
-
-    function renderS(list, salesCounts = null) {
-        const grid = document.getElementById('product-grid'); grid.innerHTML = '';
-        const filtered = list.filter(p => p.visible !== false && p.stock > 0);
-
-        if(filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px; color:#999"><i class="fas fa-search" style="font-size:3rem"></i><p><br>No hay productos en esta sección.</p></div>`;
-            return;
-        }
-
-        filtered.forEach((p, index) => {
-            const hasPromo = p.promoActive && p.promoPrice;
-            const priceFinal = hasPromo ? p.promoPrice : p.price;
-            
-            let badge = p.promoActive ? `<span class="badge-status bg-promo">OFERTA</span>` : '';
-            if (p.esNuevo) badge = `<span class="badge-status bg-new">NUEVO</span>`;
-            
-            if(salesCounts && index < 3) {
-                const medals = ['🥇', '🥈', '🥉'];
-                badge = `<span class="badge-status bg-best">${medals[index]} TOP ${index+1}</span>`;
+        // Al cargar la página recuperamos el carrito o iniciamos vacío
+        window.onload = () => {
+            const data = localStorage.getItem('carrito_proprinec');
+            if (data) {
+                carrito = JSON.parse(data);
+                render();
             }
+        };
 
-            grid.innerHTML += `
-                <div class="card">
-                    ${badge}
-                    <img src="${p.img}" loading="lazy">
-                    <h4>${p.name}</h4>
-                    <p class="price-tag">$${parseFloat(priceFinal).toFixed(2)} 
-                        ${hasPromo ? `<span class="old-price">$${p.price}</span>` : ''}
-                    </p>
-                    <button class="btn-add" onclick="addC('${p.id}','${p.name}',${priceFinal},'${p.img}',${p.stock})">+</button>
-                </div>`;
-        });
-    }
-
-    // --- FILTROS ---
-
-    window.filterType = (type) => {
-        window.scrollTo({top: 0, behavior: 'smooth'}); closeAll();
-        if(type === 'inicio') renderS(allProds);
-        if(type === 'ofertas') renderS(allProds.filter(p => p.promoActive));
-        if(type === 'nuevos') {
-            const unMesAtras = Date.now() - (30 * 24 * 60 * 60 * 1000);
-            renderS(allProds.filter(p => p.esNuevo || (p.timestamp && p.timestamp > unMesAtras)));
+        function agregarAlCarrito(name, price) {
+            carrito.push({ name, price });
+            localStorage.setItem('carrito_proprinec', JSON.stringify(carrito));
+            render();
         }
-        if(type === 'ventas') {
-            let counts = {};
-            allOrders.forEach(o => o.items.forEach(it => counts[it.id] = (counts[it.id] || 0) + it.qty));
-            let sorted = [...allProds].sort((a,b) => (counts[b.id] || 0) - (counts[a.id] || 0));
-            renderS(sorted, counts);
+
+        function render() {
+            document.getElementById('cart-count').innerText = carrito.length;
+            const total = carrito.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
+            
+            const bar = document.getElementById('cart-bar');
+            if (carrito.length > 0) {
+                bar.classList.remove('translate-y-full');
+            } else {
+                bar.classList.add('translate-y-full');
+            }
         }
-    };
 
-    window.filterCat = (cat, btn) => {
-        closeAll();
-        if(btn) {
-            document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
+        function irAPagar() {
+            if (carrito.length > 0) {
+                window.location.href = "pago.html";
+            }
         }
-        renderS(cat === 'Todos' ? allProds : allProds.filter(p => p.category === cat));
-    };
-
-    // --- CARRITO ---
-
-    window.addC = (id, n, p, i, max) => {
-        const ex = cart.find(x => x.id === id); 
-        if(ex) { 
-            if(ex.qty < max) ex.qty++; 
-            else return Swal.fire('Stock Máximo', 'No hay más unidades', 'info');
-        } else { 
-            cart.push({id, name: n, price: p, img: i, qty: 1, maxStock: max}); 
-        }
-        save(); toggleCart(true);
-    };
-
-    window.updateQty = async (id, delta) => {
-        const item = cart.find(x => x.id === id);
-        if(!item) return;
-
-        if(delta === -1 && item.qty === 1) {
-            const res = await Swal.fire({
-                title: '¿Eliminar producto?',
-                text: `¿Quieres quitar ${item.name} del carrito?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ff4b4b',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            });
-            if(res.isConfirmed) cart = cart.filter(x => x.id !== id);
-        } else {
-            if(delta === 1 && item.qty >= item.maxStock) return Swal.fire('Límite', 'No hay más unidades', 'info');
-            item.qty += delta;
-        }
-        save();
-    };
-
-    function save() { sessionStorage.setItem('market_cart', JSON.stringify(cart)); renderC(); }
-    
-    function renderC() {
-        let total = 0, count = 0;
-        const container = document.getElementById('cart-items');
-        if(cart.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:gray"><i class="fas fa-shopping-basket" style="font-size:3rem"></i><p><br>Tu carrito está vacío</p></div>`;
-        } else {
-            container.innerHTML = cart.map(i => {
-                total += i.price * i.qty; count += i.qty;
-                return `
-                <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center">
-                    <img src="${i.img}" width="55" height="55" style="border-radius:12px; object-fit:cover">
-                    <div style="flex:1">
-                        <b style="font-size:0.85rem">${i.name}</b><br>
-                        <div class="qty-ctrl">
-                            <button class="qty-btn" onclick="updateQty('${i.id}', -1)">-</button>
-                            <span style="font-weight:800; font-size:0.9rem">${i.qty}</span>
-                            <button class="qty-btn" onclick="updateQty('${i.id}', 1)">+</button>
-                        </div>
-                    </div>
-                    <b style="color:var(--main); font-size:0.95rem">$${(i.price * i.qty).toFixed(2)}</b>
-                </div>`;
-            }).join('');
-        }
-        document.getElementById('count').innerText = count;
-        document.getElementById('total-p').innerText = `$${total.toFixed(2)}`;
-    }
-
-    // --- UI ---
-
-    window.toggleCart = (force) => {
-        const s = document.getElementById('sidebar'), o = document.getElementById('overlay');
-        if(force) { s.classList.add('active'); o.classList.add('active'); }
-        else { s.classList.toggle('active'); o.classList.toggle('active'); }
-    };
-
-    window.closeAll = () => {
-        document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('overlay').classList.remove('active');
-    };
-
-    window.openAbout = () => {
-        Swal.fire({
-            title: '<strong>MINI MARKET PROPINEC</strong>',
-            icon: 'info',
-            html: `<div style="text-align:left; font-size:0.9rem; line-height:1.6">
-                <p><b>Historia:</b> Servimos a Babahoyo con productos frescos y los mejores precios.</p>
-                <p><b>WhatsApp:</b> 0993252739</p>
-                <p><b>Horario:</b> 7:00 AM - 10:00 PM</p>
-            </div>`,
-            confirmButtonColor: '#ff4b4b'
-        });
-    };
-
-    document.getElementById('search').oninput = (e) => {
-        const v = e.target.value.toLowerCase();
-        renderS(allProds.filter(p => p.name.toLowerCase().includes(v)));
-    };
-
-    renderC();
-</script>
+    </script>
 </body>
 </html>
