@@ -3,62 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | MINI MARKET PROPRINEC</title>
+    <title>Finalizar Pedido | PROPRINEC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-50 p-4">
 
-    <div class="max-w-md mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100">
-        
-        <!-- Header -->
+    <div class="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 mt-4">
         <div class="bg-blue-900 p-8 text-white text-center">
-            <div class="w-16 h-16 bg-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
-                <i class="fas fa-map-marker-alt"></i>
-            </div>
-            <h2 class="text-2xl font-black italic">FINALIZAR PEDIDO</h2>
-            <p class="text-xs text-blue-300 font-bold uppercase tracking-tighter">Mini Market Proprinec</p>
+            <h2 class="text-2xl font-black tracking-tighter">FINALIZAR PEDIDO</h2>
+            <p class="text-[10px] uppercase font-bold text-blue-300 tracking-widest mt-1">Completa tus datos de envío</p>
         </div>
 
-        <div class="p-8 space-y-6">
+        <div class="p-8 space-y-5">
+            <!-- Resumen Visual -->
+            <div class="bg-blue-50 p-6 rounded-3xl border-2 border-dashed border-blue-100">
+                <div class="flex justify-between items-center text-sm mb-2">
+                    <span class="text-gray-500 font-bold">Productos (<span id="res-cant">0</span>):</span>
+                    <span id="res-sub" class="font-black text-blue-900">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-sm mb-4">
+                    <span class="text-gray-500 font-bold">Costo de Envío:</span>
+                    <span class="font-black text-green-600">$1.00</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-blue-200 pt-4">
+                    <span class="text-xs font-bold text-blue-400 uppercase">Total a Pagar:</span>
+                    <span id="res-total" class="text-2xl font-black text-blue-900">$0.00</span>
+                </div>
+            </div>
+
             <!-- Formulario -->
             <div class="space-y-4">
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nombre y Apellido</label>
-                    <input type="text" id="cliente" placeholder="Ej. Juan Pérez" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-gray-700 shadow-inner">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nombre Completo</label>
+                    <input type="text" id="nombre" placeholder="Ej. Juan Valdez" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-700">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Ciudadela / Sector</label>
+                    <input type="text" id="sector" placeholder="Ej. Ciudad El Valle" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-700">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Ciudadela</label>
-                        <input type="text" id="ciudadela" placeholder="Ej. El Chorrillo" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-gray-700 shadow-inner">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Manzana</label>
+                        <input type="text" id="mz" placeholder="Ej. Mz 4" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-700">
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Mz / Villa</label>
-                        <input type="text" id="casa" placeholder="Mz 4 V 2" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-gray-700 shadow-inner">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Villa</label>
+                        <input type="text" id="villa" placeholder="Ej. V 2" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-700">
                     </div>
                 </div>
             </div>
 
-            <!-- Resumen -->
-            <div class="bg-slate-50 p-6 rounded-3xl border border-dashed border-gray-200">
-                <h4 class="text-xs font-black text-slate-400 uppercase mb-3 flex justify-between">
-                    <span>Resumen de Productos</span>
-                    <span id="resumen-cant">0 ítems</span>
-                </h4>
-                <div id="items-list" class="text-sm font-bold text-slate-700 space-y-2 mb-4"></div>
-                <div class="flex justify-between items-center border-t border-gray-200 pt-4">
-                    <span class="text-xs font-bold text-gray-400">TOTAL A PAGAR:</span>
-                    <span id="final-total" class="text-2xl font-black text-blue-900">$0.00</span>
-                </div>
-            </div>
-
-            <!-- Botón -->
-            <button onclick="confirmarPedido()" id="btn-envio" class="w-full bg-green-600 text-white py-5 rounded-[1.5rem] font-black text-lg shadow-xl shadow-green-100 hover:bg-green-700 transition-all flex items-center justify-center gap-3">
-                <i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO
-            </button>
-            <button onclick="location.href='index.html'" class="w-full text-gray-400 text-xs font-bold uppercase tracking-widest hover:text-blue-600">
-                <i class="fas fa-arrow-left mr-1"></i> Regresar al catálogo
+            <button onclick="confirmarVenta()" id="btn-final" class="w-full bg-green-600 text-white py-5 rounded-3xl font-black text-lg shadow-xl hover:bg-green-700 transition-all flex items-center justify-center gap-3">
+                <i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR COMPRA
             </button>
         </div>
     </div>
@@ -67,7 +64,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = { 
             apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", 
             projectId: "mi-mini-market", 
@@ -76,77 +72,77 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Cargar Carrito
-        let carrito = JSON.parse(localStorage.getItem('proprinec_cart')) || [];
-        if(carrito.length === 0) window.location.href = "index.html";
+        // 1. CARGAR DATOS
+        let carrito = JSON.parse(localStorage.getItem('carrito_proprinec')) || [];
+        
+        // SI NO HAY NADA, VOLVER AL INICIO (Para evitar el bug)
+        if (carrito.length === 0) {
+            window.location.replace("index.html");
+        }
 
-        // Renderizar Resumen
-        const total = carrito.reduce((s, i) => s + i.price, 0);
-        document.getElementById('final-total').innerText = `$${total.toFixed(2)}`;
-        document.getElementById('resumen-cant').innerText = `${carrito.length} ítems`;
-        document.getElementById('items-list').innerHTML = carrito.map(i => `
-            <div class="flex justify-between">
-                <span>• ${i.name}</span>
-                <span>$${i.price.toFixed(2)}</span>
-            </div>
-        `).join('');
+        const subtotal = carrito.reduce((s, i) => s + i.price, 0);
+        const totalFinal = subtotal + 1.00;
 
-        window.confirmarPedido = async () => {
-            const cli = document.getElementById('cliente').value;
-            const ciu = document.getElementById('ciudadela').value;
-            const cas = document.getElementById('casa').value;
+        document.getElementById('res-cant').innerText = carrito.length;
+        document.getElementById('res-sub').innerText = `$${subtotal.toFixed(2)}`;
+        document.getElementById('res-total').innerText = `$${totalFinal.toFixed(2)}`;
 
-            if(!cli || !ciu) {
-                Swal.fire("¡Faltan datos!", "Por favor indica tu nombre y ubicación", "warning");
-                return;
-            }
+        window.confirmarVenta = async () => {
+            const nom = document.getElementById('nombre').value;
+            const sec = document.getElementById('sector').value;
+            const m = document.getElementById('mz').value;
+            const v = document.getElementById('villa').value;
 
-            const btn = document.getElementById('btn-envio');
+            if(!nom || !sec) return alert("Por favor completa tu nombre y dirección");
+
+            const btn = document.getElementById('btn-final');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> PROCESANDO...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> PROCESANDO...`;
 
             try {
-                // 1. GUARDAR EN FIREBASE (Para el panel de logística y auto-print)
-                const pedidoDB = {
-                    cliente: cli,
-                    direccion: { ciudadela: ciu, manzana: cas, villa: "-" },
+                // 2. GUARDAR EN FIREBASE (Para el Ticket Automático)
+                const pedidoData = {
+                    cliente: nom,
+                    direccion: { ciudadela: sec, manzana: m, villa: v },
                     items: carrito.map(i => ({ name: i.name, qty: 1, price: i.price })),
-                    total: total,
+                    total: totalFinal,
                     pago: "WhatsApp / Transferencia",
                     estado: "Preparando",
                     fecha: new Date(),
                     fechaTexto: new Date().toLocaleString()
                 };
 
-                await addDoc(collection(db, "pedidos"), pedidoDB);
+                await addDoc(collection(db, "pedidos"), pedidoData);
 
-                // 2. PREPARAR MENSAJE WHATSAPP
-                let msg = `*NUEVO PEDIDO - PROPRINEC*\n\n`;
-                msg += `👤 *Cliente:* ${cli}\n`;
-                msg += `📍 *Ubicación:* ${ciu} - ${cas}\n\n`;
-                msg += `🛒 *Detalle:*\n`;
-                carrito.forEach(i => msg += `- ${i.name} ($${i.price.toFixed(2)})\n`);
-                msg += `\n*TOTAL A PAGAR: $${total.toFixed(2)}*`;
+                // 3. ARMAR WHATSAPP
+                let msj = `*NUEVO PEDIDO - PROPRINEC*\n\n`;
+                msj += `👤 *Cliente:* ${nom}\n`;
+                msj += `📍 *Dir:* ${sec} - ${m} - ${v}\n\n`;
+                msj += `🛒 *Productos:*\n`;
+                carrito.forEach(i => msj += `- ${i.name} ($${i.price.toFixed(2)})\n`);
+                msj += `\n*TOTAL A PAGAR: $${totalFinal.toFixed(2)}*`;
 
-                // === 3. LIMPIEZA TOTAL (Aquí está la solución al fallo) ===
-                localStorage.removeItem('proprinec_cart');
+                // === 4. LA SOLUCIÓN DEFINITIVA ===
+                
+                // A. Limpiamos la memoria del carrito YA
+                localStorage.removeItem('carrito_proprinec');
                 localStorage.clear();
 
-                // 4. ACCIÓN DOBLE
-                const tel = "593993252739"; // Tu número de Proprinec
-                const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
-                
-                // Abrir WhatsApp en nueva pestaña
+                // B. Preparamos el link
+                const url = `https://wa.me/593993252739?text=${encodeURIComponent(msj)}`;
+
+                // C. Abrimos WhatsApp en nueva pestaña
                 window.open(url, '_blank');
 
-                // Redirigir esta página al inicio (ya vacío)
-                window.location.href = "index.html";
+                // D. REEMPLAZAMOS la página actual por un inicio limpio
+                // replace() hace que la página de pago desaparezca del historial
+                window.location.replace("index.html");
 
-            } catch (e) {
-                console.error(e);
-                Swal.fire("Error", "No se pudo conectar con el sistema", "error");
+            } catch (error) {
+                console.error(error);
+                alert("Hubo un error de conexión");
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO`;
+                btn.innerHTML = `<i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR COMPRA`;
             }
         };
     </script>
