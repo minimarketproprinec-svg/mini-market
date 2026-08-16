@@ -9,9 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Scripts para PDF e Impresión -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -38,47 +36,55 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         /* CONTENIDO */
-        .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }
+        .container { padding: 20px; max-width: 1300px; margin: 0 auto; }
+        .card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }
         
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 800; border-bottom: 1px solid var(--border); }
-        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 800; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
 
-        /* ESTADOS */
-        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        /* BADGES */
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .bg-prep { background: #fff7ed; color: #c2410c; }
         .bg-way { background: #eff6ff; color: #1d4ed8; }
         .bg-ok { background: #ecfdf5; color: #047857; }
 
-        /* BOTONES DE ACCIÓN */
-        .btn-group { display: flex; gap: 5px; }
+        /* BOTONES */
+        .btn-group { display: flex; gap: 4px; }
         .btn-action { 
-            width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; 
+            width: 32px; height: 32px; border-radius: 6px; border: none; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; transition: 0.2s; color: white;
         }
         .btn-prep { background: #f59e0b; }
         .btn-way { background: var(--way); }
         .btn-ok { background: var(--success); }
         .btn-print { background: var(--dark); }
-        .btn-del { background: var(--main); }
+        .btn-del { background: #cbd5e1; color: #475569; }
         .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* --- PLANTILLA ÚNICA DE TICKET (OCULTA) --- */
+        /* --- TICKET DE IMPRESIÓN (OCULTO EN PANTALLA) --- */
         #master-ticket { 
-            width: 80mm; padding: 10mm 5mm; background: white; color: black;
-            position: fixed; left: -1000px; top: 0;
-            font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.2;
+            display: none; /* Oculto en vista normal */
         }
-        .t-header { text-align: center; margin-bottom: 10px; }
-        .t-divider { border-top: 1px dashed #000; margin: 10px 0; }
-        .t-item { display: flex; justify-content: space-between; margin-bottom: 3px; }
-        .t-total { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; margin-top: 5px; }
 
         @media print {
             body * { visibility: hidden; }
             #master-ticket, #master-ticket * { visibility: visible; }
-            #master-ticket { position: absolute; left: 0; top: 0; width: 100%; }
+            #master-ticket { 
+                display: block !important;
+                position: absolute; 
+                left: 0; top: 0; 
+                width: 58mm; /* Ajustar a 80mm si tu papel es más ancho */
+                padding: 2mm;
+                font-family: 'Courier Prime', monospace; 
+                font-size: 11px; 
+                color: black;
+                background: white;
+            }
+            .t-header { text-align: center; margin-bottom: 5px; }
+            .t-divider { border-top: 1px dashed #000; margin: 5px 0; }
+            .t-item { display: flex; justify-content: space-between; margin-bottom: 2px; }
+            .t-total { font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 5px; }
         }
     </style>
 </head>
@@ -86,11 +92,11 @@
 
     <header>
         <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo.jpg" style="height: 40px;" onerror="this.style.display='none'">
-            <h2 style="font-weight: 800; letter-spacing: -1px;">CONTROL DE LOGÍSTICA</h2>
+            <h2 style="font-weight: 800; letter-spacing: -1px; color: var(--dark)">PROPRINEC <span style="color: var(--main)">SYSTEM</span></h2>
         </div>
         <div class="status-live">
-            <div class="dot"></div> SISTEMA EN VIVO
+            <i class="fas fa-print"></i> AUTO-PRINT ACTIVO
+            <div class="dot"></div>
         </div>
     </header>
 
@@ -102,27 +108,27 @@
                         <th>Hora</th>
                         <th>Cliente</th>
                         <th>Ubicación</th>
-                        <th>Pago</th>
+                        <th>Total</th>
                         <th>Estado</th>
                         <th>Acciones de Despacho</th>
                     </tr>
                 </thead>
                 <tbody id="p-body">
-                    <!-- Pedidos dinámicos -->
+                    <tr><td colspan="6" style="text-align:center; padding:40px; color:#94a3b8 italic">Cargando pedidos de Firebase...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- AUDIO PARA NUEVOS PEDIDOS -->
+    <!-- AUDIO -->
     <audio id="beep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
     <!-- CONTENEDOR DE TICKET ÚNICO -->
     <div id="master-ticket">
         <div class="t-header">
-            <strong id="t-negocio">MINI MARKET PROPINEC</strong><br>
-            <span id="t-eslogan">"Donde más barato es"</span><br>
-            <span id="t-direccion">Babahoyo, Ecuador</span><br>
+            <strong style="font-size: 14px;">MINI MARKET PROPRINEC</strong><br>
+            <span>"Donde más barato es"</span><br>
+            <span>Babahoyo, Ecuador</span><br>
             <span id="t-tel">Tel: 0993252739</span>
         </div>
         <div class="t-divider"></div>
@@ -149,10 +155,19 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, limit, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", authDomain: "mi-mini-market.firebaseapp.com", projectId: "mi-mini-market", storageBucket: "mi-mini-market.firebasestorage.app", messagingSenderId: "19960510315", appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" };
-    const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+    const firebaseConfig = { 
+        apiKey: "AIzaSyADC-f3HCv-jIoY4frUbpfRB3lY6qXMK8c", 
+        authDomain: "mi-mini-market.firebaseapp.com", 
+        projectId: "mi-mini-market", 
+        storageBucket: "mi-mini-market.firebasestorage.app", 
+        messagingSenderId: "19960510315", 
+        appId: "1:19960510315:web:fe0743420e7ba893b2fe2e" 
+    };
+
+    const app = initializeApp(firebaseConfig); 
+    const db = getFirestore(app);
 
     let ready = false;
     let pedidosCache = [];
@@ -163,44 +178,63 @@
         
         renderPedidos(pedidosCache);
 
-        if (!ready) { ready = true; return; }
+        // La primera vez que carga, marca como ready y no imprime nada
+        if (!ready) { 
+            ready = true; 
+            console.log("Sistema sincronizado. Esperando pedidos nuevos...");
+            return; 
+        }
 
-        // Alertar sobre nuevos pedidos
+        // Detectar SOLO pedidos nuevos
         snap.docChanges().forEach(change => {
             if (change.type === "added") {
-                document.getElementById('beep').play().catch(e => console.log("Audio requiere interacción"));
-                generarTicket(change.doc.data(), true); // Auto-imprimir al llegar
+                console.log("¡Nuevo pedido recibido!");
+                const nuevoPedido = change.doc.data();
+                
+                // Reproducir sonido
+                const beep = document.getElementById('beep');
+                beep.play().catch(() => console.log("Clic en la página para habilitar sonido"));
+
+                // DISPARAR IMPRESIÓN AUTOMÁTICA
+                window.generarTicket(nuevoPedido, true); 
             }
         });
     });
 
     function renderPedidos(lista) {
-        document.getElementById('p-body').innerHTML = lista.map(p => {
+        const body = document.getElementById('p-body');
+        if (lista.length === 0) {
+            body.innerHTML = `<tr><td colspan="6" style="text-align:center">No hay pedidos hoy</td></tr>`;
+            return;
+        }
+
+        body.innerHTML = lista.map(p => {
             let badgeClass = p.estado === 'Preparando' ? 'bg-prep' : (p.estado === 'En camino' ? 'bg-way' : 'bg-ok');
+            let hora = p.fechaTexto ? p.fechaTexto.split(',')[1] : 'Reciente';
+            
             return `
             <tr>
-                <td><small>${p.fechaTexto ? p.fechaTexto.split(',')[1] : 'Reciente'}</small></td>
+                <td><small>${hora}</small></td>
                 <td><b>${p.cliente.toUpperCase()}</b></td>
                 <td><small>${p.direccion.ciudadela}<br>Mz ${p.direccion.manzana} Vlla ${p.direccion.villa}</small></td>
-                <td><span class="badge bg-ok" style="background:#f1f5f9; color:#475569">$${p.total.toFixed(2)} (${p.pago})</span></td>
+                <td><span class="badge" style="background:#f1f5f9; color:#475569">$${p.total.toFixed(2)} (${p.pago})</span></td>
                 <td><span class="badge ${badgeClass}">${p.estado}</span></td>
                 <td>
                     <div class="btn-group">
-                        <button class="btn-action btn-prep" title="Preparando" onclick="updEstado('${p.id}','Preparando')"><i class="fas fa-box"></i></button>
-                        <button class="btn-action btn-way" title="En camino" onclick="updEstado('${p.id}','En camino')"><i class="fas fa-motorcycle"></i></button>
-                        <button class="btn-action btn-ok" title="Entregado" onclick="updEstado('${p.id}','Entregado')"><i class="fas fa-check"></i></button>
-                        <button class="btn-action btn-print" title="Reimprimir Ticket" onclick="reimprimir('${p.id}')"><i class="fas fa-print"></i></button>
-                        <button class="btn-action btn-del" title="Eliminar" onclick="eliminarPedido('${p.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action btn-prep" onclick="updEstado('${p.id}','Preparando')"><i class="fas fa-box"></i></button>
+                        <button class="btn-action btn-way" onclick="updEstado('${p.id}','En camino')"><i class="fas fa-motorcycle"></i></button>
+                        <button class="btn-action btn-ok" onclick="updEstado('${p.id}','Entregado')"><i class="fas fa-check"></i></button>
+                        <button class="btn-action btn-print" onclick="reimprimir('${p.id}')"><i class="fas fa-print"></i></button>
+                        <button class="btn-action btn-del" onclick="eliminarPedido('${p.id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>
             </tr>`;
         }).join('');
     }
 
-    // 2. Lógica Dinámica de Ticket Único
+    // 2. Lógica de Llenado de Ticket
     window.generarTicket = (p, autoPrint = false) => {
-        // Llenar campos dinámicos
-        document.getElementById('t-fecha').innerText = p.fechaTexto;
+        document.getElementById('t-fecha').innerText = p.fechaTexto || new Date().toLocaleString();
         document.getElementById('t-cliente').innerText = p.cliente.toUpperCase();
         document.getElementById('t-dir').innerText = `${p.direccion.ciudadela}, Mz ${p.direccion.manzana} Vlla ${p.direccion.villa}`;
         document.getElementById('t-pago').innerText = p.pago.toUpperCase();
@@ -210,7 +244,6 @@
         document.getElementById('t-sub').innerText = `$${subtotal.toFixed(2)}`;
         document.getElementById('t-total').innerText = `$${p.total.toFixed(2)}`;
 
-        // Llenar lista de productos
         let itemsHtml = p.items.map(i => `
             <div class="t-item">
                 <span>${i.qty} x ${i.name.substring(0,18)}</span>
@@ -220,13 +253,16 @@
         document.getElementById('t-items').innerHTML = itemsHtml;
 
         if(autoPrint) {
-            setTimeout(() => window.print(), 800);
+            // Un pequeño delay asegura que el DOM se actualice antes de imprimir
+            setTimeout(() => {
+                window.print();
+            }, 1000);
         }
     };
 
     window.reimprimir = (id) => {
         const ped = pedidosCache.find(x => x.id === id);
-        if(ped) generarTicket(ped, true);
+        if(ped) window.generarTicket(ped, true);
     };
 
     window.updEstado = async (id, nuevoE) => {
@@ -234,14 +270,12 @@
     };
 
     window.eliminarPedido = async (id) => {
-        const pss = prompt("Clave de seguridad para eliminar:");
-        if(pss === "2024") {
+        if(confirm("¿Seguro que deseas eliminar este pedido?")) {
             await deleteDoc(doc(db, "pedidos", id));
-            Swal.fire("Eliminado", "El pedido ha sido borrado del historial", "success");
         }
     };
 
-    // Activar audio en el primer clic
+    // Habilitar audio
     document.addEventListener('click', () => {
         const audio = document.getElementById('beep');
         audio.play().then(() => { audio.pause(); audio.currentTime = 0; });
